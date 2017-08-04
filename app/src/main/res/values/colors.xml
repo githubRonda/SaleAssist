@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#eb4f38</color>
+    <color name="colorPrimaryDark">#eb4f38</color>
+
+<!--    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#eb4f38</color>
+    <color name="colorPrimaryDark">#eb4f38</color>-->
+    <!--<color name="colorAccent">#FFE800</color>-->
+
+
+
+    <color name="background_tab_pressed">#6633B5E5</color>
+    <color name="bg_tab_select">#80FF80</color>
+    <!-- <color name="bg_tab_unselect">#C0C0C0</color>-->
+    <color name="bg_tab_unselect">#272636</color>
+    <color name="bg_tab">#fff</color>
+
+
+    <!--LoginActivity-->
+    <color name="bg_btn_nomal">#45c01a</color>
+    <color name="bg_btn_pressed">#2C900A</color>
+    <color name="bg_btn_disable">#a2e08d</color>
+    <color name="txt_input">#B7B7B7</color>
+    <color name="short_msg">#3F51B5</color>
+
+
+    <color name="background">#f1f1f1</color>
+
+    <!--HomeFragment-->
+    <color name="menu_background_normal">#e6e6e6</color>
+    <color name="menu_background_selcted">#f1f1f1</color>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><!-- 渐出动画 -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+     android:interpolator="@android:anim/decelerate_interpolator">
+
+    <alpha
+        android:duration="@android:integer/config_shortAnimTime"
+        android:fromAlpha="1.0"
+        android:toAlpha="0.0"/>
+    <!-- decelerate_interpolator:表示动画先快后慢。accelerate_interpolator表示动画先慢后快
+     accelerate_decelerate_interpolator 先加速在加速
+     -->
+</set>

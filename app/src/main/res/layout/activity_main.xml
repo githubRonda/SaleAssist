@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include
+            layout="@layout/include_toolbar"/>
+
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/lightslategray"/>
+
+        <!--使用RadioGroup来实现tab的切换-->
+        <RadioGroup
+            android:id="@+id/rg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <RadioButton
+                android:id="@+id/rb_home"
+                style="@style/bottom_tab"
+                android:drawableTop="@drawable/sel_home"
+                android:text="首页"/>
+
+            <RadioButton
+                android:id="@+id/rb_cart"
+                style="@style/bottom_tab"
+                android:drawableTop="@drawable/sel_course"
+                android:text="菜单"/>
+
+            <RadioButton
+                android:id="@+id/rb_direct_seeding"
+                style="@style/bottom_tab"
+                android:drawableTop="@drawable/sel_direct_seeding"
+                android:text="直播"
+                android:visibility="gone"/>
+
+            <RadioButton
+                android:id="@+id/rb_me"
+                style="@style/bottom_tab"
+                android:drawableTop="@drawable/sel_me"
+                android:text="我的"/>
+
+        </RadioGroup>
+    </LinearLayout>
+
+    <!--导航页-->
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/nav_drawer"/>
+
+</android.support.v4.widget.DrawerLayout>

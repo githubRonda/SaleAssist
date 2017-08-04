@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+
+        <Button
+            android:id="@+id/btn_string_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="StringRequest的用法"
+            android:textAllCaps="false"
+            />
+
+        <Button
+            android:id="@+id/btn_json_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="JsonRequest的用法"
+            android:textAllCaps="false"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            >
+
+            <Button
+                android:id="@+id/btn_image_request"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="使用ImageRequest加载图片"
+                android:textAllCaps="false"
+                />
+
+            <ImageView
+                android:id="@+id/iv_image_request"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            >
+
+            <Button
+                android:id="@+id/btn_image_loader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="使用ImageLoader加载图片"
+                android:textAllCaps="false"
+                />
+
+            <ImageView
+                android:id="@+id/iv_image_loader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <Button
+                android:id="@+id/btn_network_imageview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="使用NetworkImageView加载图片"
+                android:textAllCaps="false"
+                />
+
+            <com.android.volley.toolbox.NetworkImageView
+                android:id="@+id/network_imageview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_xml_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="自定义XMLRequest"
+            android:textAllCaps="false"
+            />
+
+        <Button
+            android:id="@+id/btn_gson_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="自定义GsonRequest"
+            android:textAllCaps="false"
+            />
+    </LinearLayout>
+</ScrollView>
+

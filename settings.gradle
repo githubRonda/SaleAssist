@@ -1,0 +1,1 @@
+include ':app', ':lib_rv_adapter', ':app_BaseRecyclerView', ':lib_rv_adapter2'

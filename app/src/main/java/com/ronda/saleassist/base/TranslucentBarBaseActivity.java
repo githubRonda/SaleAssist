@@ -1,0 +1,36 @@
+package com.ronda.saleassist.base;
+
+import android.os.Build;
+import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+
+/**
+ * 本类的作用就是在Activity的布局的根标签添加android:fitsSystemWindows="true"，目的是为了沉浸式布局
+ * 本类暂时不用
+ */
+public abstract class TranslucentBarBaseActivity extends BaseActivty {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        setContentView(getLayoutResId());//把设置布局文件的操作交给继承的子类
+        ViewGroup contentFrameLayout = (ViewGroup) findViewById(Window.ID_ANDROID_CONTENT);
+        View parentView = contentFrameLayout.getChildAt(0);
+
+        if (parentView != null && Build.VERSION.SDK_INT >= 14) {
+            parentView.setFitsSystemWindows(true);
+        }
+    }
+    /**
+     * 返回当前Activity布局文件的id
+     *
+     * @return
+     */
+    abstract protected int getLayoutResId();
+}
+

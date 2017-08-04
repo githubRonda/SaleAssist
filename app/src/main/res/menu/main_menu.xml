@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".activity.MainActivity" >
+    <item
+        android:id="@+id/search"
+        android:orderInCategory="1"
+        app:showAsAction="always"
+
+        android:title="搜索"/>
+    <!--android:icon="@mipmap/ic_search"-->
+    <!--app:actionViewClass="android.support.v7.widget.SearchView"-->
+    <item
+        android:visible="false"
+        android:id="@+id/share"
+        android:orderInCategory="2"
+        app:showAsAction="always"
+        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+        android:title="分享"/>
+    <item
+        android:visible="false"
+        android:id="@+id/setting"
+        android:orderInCategory="1"
+        android:icon="@mipmap/ic_launcher"
+        app:showAsAction="never"
+        android:title="设置"/>
+    <!--
+        1. icon 默认是不会显示在溢出菜单中的，除非设置 showAsAction="always", 此时 icon 才会显示在 toolbar 上
+        2. 当item设置了 showAsAction="always" 时，此时item的icon显示的优先级要比title高，（即，若这个item既设置了icon，有设置了title，则只会显示icon。除非是没有设置icon，才会            在toolbar上显示title）
+     -->
+</menu>

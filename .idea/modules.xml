@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SaleAssist.iml" filepath="$PROJECT_DIR$/SaleAssist.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app_BaseRecyclerView/app_BaseRecyclerView.iml" filepath="$PROJECT_DIR$/app_BaseRecyclerView/app_BaseRecyclerView.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lib_rv_adapter/lib_rv_adapter.iml" filepath="$PROJECT_DIR$/lib_rv_adapter/lib_rv_adapter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lib_rv_adapter2/lib_rv_adapter2.iml" filepath="$PROJECT_DIR$/lib_rv_adapter2/lib_rv_adapter2.iml" />
+    </modules>
+  </component>
+</project>
