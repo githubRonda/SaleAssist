@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -129,7 +130,7 @@ public abstract class BaseActivty extends AppCompatActivity {
     }
 
     /**
-     * 添加 Fragment
+     * 添加 Fragment . 无回退栈
      *
      * @param containerViewId
      * @param fragment
@@ -141,7 +142,7 @@ public abstract class BaseActivty extends AppCompatActivity {
     }
 
     /**
-     * 添加 Fragment
+     * 添加 Fragment. 有回退栈
      *
      * @param containerViewId
      * @param fragment
@@ -155,7 +156,24 @@ public abstract class BaseActivty extends AppCompatActivity {
     }
 
     /**
-     * 替换 Fragment
+     * 在指定容器中，隐藏一个Fragment，显示另一个Fragment
+     *
+     * @param containerViewId
+     * @param from
+     * @param to
+     */
+    protected void showFragment(int containerViewId, Fragment from, Fragment to) {
+        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = supportFragmentManager.beginTransaction();
+        if (!to.isAdded()) {    // 先判断是否被add过
+            transaction.hide(from).add(containerViewId, to).commit(); // 隐藏当前的fragment，add下一个到Activity中
+        } else {
+            transaction.hide(from).show(to).commit(); // 隐藏当前的fragment，显示下一个
+        }
+    }
+
+    /**
+     * 替换 Fragment. 有回退栈
      *
      * @param containerViewId
      * @param fragment
@@ -169,7 +187,7 @@ public abstract class BaseActivty extends AppCompatActivity {
     }
 
     /**
-     * 替换 Fragment
+     * 替换 Fragment. 有回退栈
      *
      * @param containerViewId
      * @param fragment
@@ -187,6 +205,18 @@ public abstract class BaseActivty extends AppCompatActivity {
             // 存在则弹出在它上面的所有fragment，并显示对应fragment
             getSupportFragmentManager().popBackStack(tag, 0);
         }
+    }
+
+    /**
+     * 替换 Fragment. 无回退栈
+     *
+     * @param containerViewId
+     * @param fragment
+     */
+    protected void replaceFragmentWithoutBackStack(int containerViewId, Fragment fragment) {
+        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = supportFragmentManager.beginTransaction();
+        fragmentTransaction.replace(containerViewId, fragment).commit();
     }
 
 

@@ -1,25 +1,245 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    >
 
     <TextView
-        android:visibility="gone"
-        android:id="@+id/tv_label"
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/customActionBarSize"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="货篮"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        />
+
+    <LinearLayout
+        android:id="@+id/top_sub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/top"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:id="@+id/btn_save_order"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_subcategory_bottom_btn"
+            android:text="保存订单"
+            android:textSize="12sp"
+            />
+
+        <Spinner
+            android:id="@+id/spinner_save"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_subcategory_bottom_btn"
+            >
+        </Spinner>
+
+        <Button
+            android:id="@+id/btn_clear"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_subcategory_bottom_btn"
+            android:text="清空货篮"
+            android:textSize="12sp"
+            />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/table_head"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top_sub"
+        android:layout_marginTop="2dp"
         android:gravity="center"
-        tools:text="test"
-        />
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="菜名"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="单价(元/kg)"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="数量(kg)"
+            android:textStyle="bold"
+            />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/icon_btn_del"
+            android:visibility="invisible"
+            />
+
+    </LinearLayout>
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom"
+        android:layout_below="@id/table_head"
+        />
 
-    </android.support.v7.widget.RecyclerView>
+    <RelativeLayout
+        android:id="@+id/bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="#802f4f4f"
+        android:gravity="center_vertical"
+        android:paddingBottom="3dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="10dp"
+        >
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/txt_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:gravity="center"
+            android:text="合计"
+            android:textSize="32sp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_total"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            >
+
+            <!--支付-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <Button
+                    android:id="@+id/btn_pay_cash"
+                    style="@style/bigRedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="现金"
+                    />
+
+                <Button
+                    android:id="@+id/btn_pay_ali"
+                    style="@style/bigRedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:maxLines="1"
+                    android:text="支付宝"
+                    />
+
+                <Button
+                    android:id="@+id/btn_pay_weixin"
+                    style="@style/bigRedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:padding="5dp"
+                    android:text="微信"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <Button
+                    android:id="@+id/btn_scan_vip_code"
+                    style="@style/bigRedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:text="扫会员码"
+                    android:visibility="gone"
+                    />
+
+                <Button
+                    android:id="@+id/btn_pay_delay"
+                    style="@style/bigRedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:text="挂账"
+                    />
+
+                <Button
+                    android:id="@+id/btn_vip_pay"
+                    style="@style/bigRedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:text="会员支付"
+                    />
+
+                <Button
+                    android:id="@+id/btn_recharge"
+                    style="@style/bigRedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_weight="1"
+                    android:text="充值"
+                    android:visibility="gone"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -2,44 +2,68 @@ package com.ronda.saleassist.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Handler;
+import android.os.Message;
 import android.view.WindowManager;
-import android.widget.Toast;
+import android.view.animation.AlphaAnimation;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.google.gson.Gson;
 import com.ronda.saleassist.R;
-import com.ronda.saleassist.base.MyApplication;
-import com.ronda.saleassist.utils.NetUtils;
+import com.ronda.saleassist.api.UserApi;
+import com.ronda.saleassist.base.AppConst;
+import com.ronda.saleassist.base.AppManager;
+import com.ronda.saleassist.base.BaseActivty;
+import com.ronda.saleassist.bean.LoginBean;
+import com.ronda.saleassist.local.preference.SPUtils;
+import com.ronda.saleassist.utils.ToastUtils;
+import com.ronda.saleassist.utils.VersionUtils;
 import com.socks.library.KLog;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /*
 启动界面的目的是：跳转Activity到登录界面(LoginActivity)，还是内容界面(MainActivity)
 在启动界面这段时间内具体要做的事情：
 1.检验token登录是否成功
 
-本来token登录和等待跳转是并行的，后来感觉token登录的返回结果有时延迟有5s左右，甚至更多。
-所以现在变成了只要收到了response结果，就立即跳转Activity
- */
-public class SplashActivity extends AppCompatActivity {
+若网络请求的时间超过了3s，则此时就直接跳转；否则继续等待，直到3s钟后跳转Activity
+*/
+public class SplashActivity extends BaseActivty {
+
+    @BindView(R.id.tv_version)
+    TextView mTvVersion;
+    @BindView(R.id.fl_root)
+    FrameLayout mFlRoot;
 
     private boolean isSuccessOfToken = false; // 标识token登录是否成功
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
+        ButterKnife.bind(this);
 
-        KLog.i("isTaskRoot:"+this.isTaskRoot());
-        KLog.i("启动界面："+ System.currentTimeMillis());
-
-        if(!this.isTaskRoot()) { //判断该Activity是不是任务空间的源Activity，“非”也就是说是被系统重新实例化出来
+        if (!this.isTaskRoot()) { //判断该Activity是不是任务空间的源Activity，“非”也就是说是被系统重新实例化出来
             finish();
             return;
         }
 
+        mTvVersion.setText("版本：" + VersionUtils.getVersionName(this));
+
         loginOfToken();
+
+        //渐变的动画效果
+        AlphaAnimation anim = new AlphaAnimation(0.3f, 1.0f);
+        anim.setDuration(2000);
+        mFlRoot.startAnimation(anim);
     }
+
 
     private void goNextActivity() {
         Intent intent;
@@ -54,68 +78,53 @@ public class SplashActivity extends AppCompatActivity {
     }
 
 
+    //使用手机号 + token
     private void loginOfToken() {
 
-        if (!NetUtils.isConnected(MyApplication.getInstance())) {
-            Toast.makeText(MyApplication.getInstance(), "无网络连接", Toast.LENGTH_SHORT).show();
-            goNextActivity();
-            return;
-        }
+        final long startTime = System.currentTimeMillis();
+        String mobile = SPUtils.getString(AppConst.MOBILE, "");
+        String token = SPUtils.getString(AppConst.TOKEN, "");
 
-//        UserApi.loginUsingToken(new UserApi.VolleyStrHandler() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Toast.makeText(SplashActivity.this, R.string.toast_error_response, Toast.LENGTH_SHORT).show();
-//                goNextActivity();
-//            }
-//
-//            @Override
-//            public void onResponse(String responseStr) {
-//                KLog.json(responseStr);
-//
-//                try {
-//                    JSONObject response = new JSONObject(responseStr);
-//                    int status = response.getInt("status");
-//                    String msg = response.getString("msg");
-//
-//                    if (status == 1) {
-//                        JSONObject data = response.getJSONObject("data");
-//
-//
-//                        //把后台数据解析成JavaBean
-//                        ShopBean shopBean = new Gson().fromJson(data.toString(), new TypeToken<ShopBean>(){}.getType());
-//                        String mobile = shopBean.getMobile();
-//                        String token = shopBean.getToken();
-//                        String nickname = shopBean.getNickname();
-//                        String userId = shopBean.getUserId();
-//                        List<ShopBean.ShopinfoBean> shopinfoList = shopBean.getShopinfo();
-//
-//                        //保存信息到SharedPreference中
-//                        SPHelper.setLoginInfo(mobile, token, nickname, userId, shopinfoList);
-//
-//
-//                        if (shopinfoList != null && shopinfoList.size()>0) {
-//                            App.curShopId = shopinfoList.get(0).getShopid();
-//                            App.curShopName = shopinfoList.get(0).getShopname();
-//                            App.isSupportAlipay = 1 == (shopinfoList.get(0).getAlipay_check())? true : false;
-//                            App.isSupportWechatPay = 1 == (shopinfoList.get(0).getWechatpay_check())? true : false;
-//                            App.calculatetype = shopinfoList.get(0).getCalculatetype();
-//                        }
-//                        App.curNickName = shopBean.getNickname();
-//
-//                        isSuccessOfToken = true;
-//
-//                    } else {
-//
-//                        isSuccessOfToken = false;
-//                        //Toast.makeText(SplashActivity.this, msg, Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//                goNextActivity();
-//            }
-//        });
+        UserApi.login(TAG, mobile, null, null, token,
+                new Response.Listener<LoginBean>() {
+                    @Override
+                    public void onResponse(final LoginBean response) {
+                        KLog.json(new Gson().toJson(response));
+
+                        if (response.getStatus() != 1) {
+                            isSuccessOfToken = false;
+
+                        } else {
+                            isSuccessOfToken = true;
+
+                            //先清空
+                            SPUtils.clear();
+
+                            //保存信息到SharedPreference中
+                            SPUtils.putString(AppConst.TOKEN, response.getData().getToken());
+                            SPUtils.putString(AppConst.MOBILE, response.getData().getMobile());
+                            SPUtils.putString(AppConst.NICK_NAME, response.getData().getMobile());
+                            SPUtils.putString(AppConst.USER_ID, response.getData().getMobile());
+                            SPUtils.putList(AppConst.LOGIN_SHOP_LIST, response.getData().getShopinfo());
+                        }
+
+                        // 若网络请求的时间超过了3s，则此时就直接跳转；否则继续等待，直到3s钟后跳转
+                        long waitTime = 3000 - (System.currentTimeMillis() - startTime);
+                        waitTime = waitTime < 0 ? 0 : waitTime;
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                ToastUtils.showToast(response.getMsg());
+                                goNextActivity();
+                            }
+                        }, waitTime);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        ToastUtils.showToast(error.getMessage());
+                    }
+                });
     }
 }

@@ -79,7 +79,11 @@ public class LoginActivity extends BaseActivty {
 
         String savePhone = SPUtils.getString(AppConst.MOBILE, "");
         mEtPhone.setText(savePhone);
-        mEtPhone.setSelection(savePhone.length());
+        //mEtPhone.setSelection(savePhone.length());//光标移到最后
+        //若保存的有手机号，则光标直接定位到密码框
+        if (!TextUtils.isEmpty(savePhone)){
+            mEtPassword.requestFocus();
+        }
     }
 
     @OnClick({R.id.btn_use_msg, R.id.btn_use_pwd, R.id.btn_login, R.id.btn_code, R.id.btn_regist})
@@ -235,7 +239,7 @@ public class LoginActivity extends BaseActivty {
                         SPUtils.clear();
 
                         //保存信息到SharedPreference中
-                        SPUtils.putString(AppConst.TOKEN, response.getData().getMobile());
+                        SPUtils.putString(AppConst.TOKEN, response.getData().getToken());
                         SPUtils.putString(AppConst.MOBILE, response.getData().getMobile());
                         SPUtils.putString(AppConst.NICK_NAME, response.getData().getMobile());
                         SPUtils.putString(AppConst.USER_ID, response.getData().getMobile());

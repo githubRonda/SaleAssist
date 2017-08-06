@@ -2,22 +2,20 @@
 <!-- 启动画面 -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fl_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/splash2"
     >
 
-    <ImageView
-        android:id="@+id/splashScreenImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/splash2"
-        />
 
     <TextView
-        android:id="@+id/creditsText"
+        android:id="@+id/tv_version"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="20dp"
         android:text=""
+        android:textColor="@android:color/white"
         />
 </FrameLayout>

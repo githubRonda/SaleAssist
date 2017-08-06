@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--侧滑菜单-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ll_right"
+    android:layout_width="240dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="end"
+    android:background="#f1f1f1"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/customActionBarSize"
+        android:background="@color/colorPrimary">
+
+        <ImageButton
+            android:id="@+id/img_arrow_right"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="left|center_vertical"
+            android:background="@drawable/sel_shrink"
+            android:visibility="visible" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="我的"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+
+    </FrameLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!--头像和用户名显示-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="?attr/colorPrimary"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+
+                android:id="@+id/personal_img_head"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_logo"
+                app:civ_border_color="#000"
+                app:civ_border_width="0dp"
+                />
+
+            <TextView
+                android:id="@+id/txt_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="未登录"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+
+        <!--功能菜单显示-->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!--订单管理-->
+                <LinearLayout
+                    android:id="@+id/ll_guazhang_manage"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/sel_click"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="1"
+                        android:text="挂账管理"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/ic_arrow" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/lightgray" />
+
+                <!--订单管理-->
+                <LinearLayout
+                    android:id="@+id/ll_order_manage"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/sel_click"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="1"
+                        android:text="订单管理"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/ic_arrow" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/lightgray" />
+
+
+                <LinearLayout
+                    android:id="@+id/ll_sell_manage"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/sel_click"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="1"
+                        android:text="销售管理"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/ic_arrow" />
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/lightgray" />
+
+
+                <!--商户申请已经隐藏-->
+                <LinearLayout
+                    android:id="@+id/ll_shop_apply"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/sel_click"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="1"
+                        android:text="商户申请"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/ic_arrow" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/lightgray"
+                    android:visibility="gone" />
+
+
+                <!--库存管理 inventory-->
+                <LinearLayout
+                    android:id="@+id/ll_stock_manage"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/sel_click"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="1"
+                        android:text="库存管理"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/ic_arrow" />
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/lightgray" />
+
+
+                <!--会员管理 inventory-->
+                <LinearLayout
+                    android:id="@+id/ll_member_manage"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/sel_click"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="1"
+                        android:text="会员管理"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/ic_arrow" />
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/lightgray" />
+
+                <!--员工管理-->
+                <LinearLayout
+                    android:id="@+id/ll_manage"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/sel_click"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="1"
+                        android:text="员工管理"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/ic_arrow" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/lightgray" />
+
+                <!--我的店铺-->
+                <LinearLayout
+                    android:id="@+id/ll_my_shop"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/sel_click"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="1"
+                        android:text="我的店铺"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/ic_arrow" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/lightgray" />
+
+                <!--批量修改单价-->
+                <LinearLayout
+                    android:id="@+id/ll_update_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/sel_click"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="1"
+                        android:text="修改单价"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/ic_arrow" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/lightgray" />
+
+
+
+                <!--设置-->
+                <LinearLayout
+                    android:id="@+id/ll_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/sel_click"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="1"
+                        android:text="设置"
+                        android:textColor="@color/gray"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/ic_arrow" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
+</LinearLayout>

@@ -2,12 +2,14 @@ package com.ronda.saleassist.base;
 
 import android.app.Application;
 import android.os.Environment;
+import android.os.Process;
 
 import com.ronda.saleassist.BuildConfig;
 import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.local.sqlite.GreenDaoHelper;
 import com.ronda.saleassist.activity.MainActivity;
 import com.ronda.saleassist.R;
+import com.ronda.saleassist.utils.ProcessUtils;
 import com.socks.library.KLog;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
@@ -32,7 +34,10 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         myApplication = this;
-       init();
+
+        if (ProcessUtils.getCurProcessName(this).equals(getPackageName())){
+            init();
+        }
     }
 
     private void init() {

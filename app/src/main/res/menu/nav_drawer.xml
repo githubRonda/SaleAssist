@@ -1,41 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group
-        android:id="@+id/group1"
-        android:checkableBehavior="single">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group>
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/ll_guazhang_manage"
             android:icon="@drawable/drawer_action_share"
-            android:title="首页" />
+            android:title="挂账管理"/>
         <item
-            android:id="@+id/nav_collection"
+            android:id="@+id/ll_order_manage"
             android:icon="@drawable/drawer_action_collection"
-            android:title="我的收藏" />
+            android:title="订单管理"/>
+
         <item
-            android:id="@+id/nav_review"
+            android:id="@+id/ll_member_manage"
             android:icon="@drawable/drawer_action_read"
-            android:title="浏览历史" />
-    </group>
-
-    <group android:checkableBehavior="none">
+            android:title="会员管理"/>
 
         <item
-            android:id="@+id/nav_setting"
-            android:icon="@mipmap/ic_launcher"
-            android:title="设置"/>
+            android:id="@+id/ll_sell_manage"
+            android:icon="@drawable/drawer_action_read"
+            android:title="销售管理"/>
     </group>
 
-    <group
-        android:id="@+id/group2"
-        android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_us"
-            android:title="关于我们" />
-        <item
-            android:id="@+id/nav_share"
-            android:title="分享" />
-        <item
-            android:id="@+id/nav_setting1"
-            android:title="设置" />
-    </group>
+
+    <item
+        android:id="@+id/ll_shop_apply"
+        android:icon="@drawable/drawer_action_share"
+        android:title="商户申请"
+        android:visible="false"/>
+    <item
+        android:id="@+id/ll_stock_manage"
+        android:icon="@drawable/drawer_action_collection"
+        android:title="库存管理"/>
+
+    <item
+        android:id="@+id/ll_update_price"
+        android:icon="@drawable/drawer_action_read"
+        android:title="修改单价"/>
+
+
+    <item
+        android:id="@+id/ll_manage"
+        android:icon="@drawable/drawer_action_share"
+        android:title="员工管理"
+        />
+
+    <item
+        android:id="@+id/ll_my_shop"
+        android:icon="@drawable/drawer_action_collection"
+        android:title="我的店铺"/>
+
+
+    <item
+        android:id="@+id/ll_setting"
+        android:icon="@drawable/drawer_action_read"
+        android:title="设置"/>
+
+
 </menu>

@@ -7,70 +7,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    tools:openDrawer="end"
+    >
 
+    <!--主布局-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        >
 
-        <include
-            layout="@layout/include_toolbar"/>
-
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
+        <fragment
+            android:id="@+id/fragment_cart"
+            android:name="com.ronda.saleassist.fragment.CartFragment"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="2"
+            />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="@color/lightslategray"/>
+        <fragment
+            android:id="@+id/fragment_category"
+            android:name="com.ronda.saleassist.fragment.GoodsFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            />
 
-        <!--使用RadioGroup来实现tab的切换-->
-        <RadioGroup
-            android:id="@+id/rg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
 
-            <RadioButton
-                android:id="@+id/rb_home"
-                style="@style/bottom_tab"
-                android:drawableTop="@drawable/sel_home"
-                android:text="首页"/>
-
-            <RadioButton
-                android:id="@+id/rb_cart"
-                style="@style/bottom_tab"
-                android:drawableTop="@drawable/sel_course"
-                android:text="菜单"/>
-
-            <RadioButton
-                android:id="@+id/rb_direct_seeding"
-                style="@style/bottom_tab"
-                android:drawableTop="@drawable/sel_direct_seeding"
-                android:text="直播"
-                android:visibility="gone"/>
-
-            <RadioButton
-                android:id="@+id/rb_me"
-                style="@style/bottom_tab"
-                android:drawableTop="@drawable/sel_me"
-                android:text="我的"/>
-
-        </RadioGroup>
     </LinearLayout>
 
+    <!--<include layout="@layout/include_main_aty_right"/>-->
+
     <!--导航页-->
+    <!--不一定要是NavigationView,可以是任何布局View,eg:LinearLayout-->
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
+        android:layout_gravity="end"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/nav_drawer"/>
+        app:menu="@menu/nav_drawer"
+        />
 
 </android.support.v4.widget.DrawerLayout>
