@@ -37,4 +37,9 @@ public interface AppConst {
      * 用户对应的店铺列表
      */
     String LOGIN_SHOP_LIST = "login_shop_list";
+
+    /**
+     * 当前店铺的id
+     */
+    String CUR_SHOP_ID = "cur_shop_id";
 }

@@ -113,15 +113,14 @@ public class SPUtils {
 
     /**
      * @param tag          key
-     * @param defaultValue 默认值
      * @param clazz        javaBean数组的字节码。eg:Student[].class
      * @return
      */
-    public static <T> List<T> getList(String tag, String defaultValue, Class<T[]> clazz) {
+    public static <T> List<T> getList(String tag, Class<T[]> clazz) {
         List<T> datalist = new ArrayList<T>();
-        String jsonStr = preferences.getString(tag, defaultValue);
+        String jsonStr = preferences.getString(tag, null);
         if (null == jsonStr) {
-            return datalist;
+            return null;
         }
 
         T[] arr = new Gson().fromJson(jsonStr, clazz);

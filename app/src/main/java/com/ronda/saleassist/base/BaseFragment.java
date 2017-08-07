@@ -13,11 +13,12 @@ import butterknife.Unbinder;
 
 
 /**
- * Created by Dragon on 2016/02/15.
+ * Created by ronda on 2016/02/15.
  */
 public abstract class BaseFragment extends Fragment {
 
     public static final String ARGUMENT = "argument";
+    protected String TAG = this.getClass().getSimpleName();;
     protected String mArgument;
 
     protected Context mContext;
@@ -28,6 +29,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Bundle bundle = getArguments();
         if (bundle != null) {
             mArgument = bundle.getString(ARGUMENT);
