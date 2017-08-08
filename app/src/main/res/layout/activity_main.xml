@@ -26,7 +26,7 @@
             />
 
         <fragment
-            android:id="@+id/fragment_category"
+            android:id="@+id/fragment_goods"
             android:name="com.ronda.saleassist.fragment.GoodsFragment"
             android:layout_width="0dp"
             android:layout_height="match_parent"

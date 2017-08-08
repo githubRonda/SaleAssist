@@ -89,7 +89,7 @@ public class SplashActivity extends BaseActivty {
                 new Response.Listener<LoginBean>() {
                     @Override
                     public void onResponse(final LoginBean response) {
-                        KLog.json(new Gson().toJson(response));
+                        //KLog.json(new Gson().toJson(response));
 
                         if (response.getStatus() != 1) {
                             isSuccessOfToken = false;

@@ -389,7 +389,7 @@ public class UserApi {
      * /market/api/shop_goods_info
      */
 
-    public static void getGoodsInfo(String tag, final int type, final String shopid, final String category, final int count, final int page, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    public static void getGoodsInfo(String tag, final String token, final int type, final String shopid, final String category, final int count, final int page, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         if (!NetUtils.isConnected(MyApplication.getInstance())) {
             ToastUtils.showToast("无网络连接");
             return;
@@ -399,7 +399,7 @@ public class UserApi {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("token", SPHelper.getLoginToken());
+                params.put("token", token);
                 params.put("type", type + "");
                 params.put("shopid", shopid);
                 params.put("category", category);

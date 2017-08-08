@@ -855,7 +855,7 @@ public abstract class BaseQuickAdapter<T, K extends BaseViewHolder> extends Recy
                     if (type == HEADER_VIEW && isHeaderViewAsFlow()) {
                         return 1;
                     }
-                    if (type == FOOTER_VIEW && isFooterViewAsFlow()) {
+                    if (type == FOOTER_VIEW && isFooterViewAsFlow() ) {
                         return 1;
                     }
                     if (mSpanSizeLookup == null) {
