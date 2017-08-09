@@ -349,7 +349,7 @@ public class UserApi {
      */
 
     /*Volley版*/
-    private static void goodsEdit(String tag, final int type, final String shopid, final String category, final String goods, final String name, final String price,
+    private static void goodsEdit(final String tag, final int type, final String shopid, final String category, final String goods, final String name, final String price,
                                   final String photo, final String discount2, final String discount3, final String intro,
                                   final String method, final String unit, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         if (!NetUtils.isConnected(MyApplication.getInstance())) {
@@ -376,7 +376,7 @@ public class UserApi {
                 params.put("method", method);
                 params.put("unit", unit);
 
-                KLog.e(new Gson().toJson(params));
+                KLog.w(tag + "--> " + new Gson().toJson(params));
                 return params;
             }
         };
@@ -389,7 +389,7 @@ public class UserApi {
      * /market/api/shop_goods_info
      */
 
-    public static void getGoodsInfo(String tag, final String token, final int type, final String shopid, final String category, final int count, final int page, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    public static void getGoodsInfo(final String tag, final String token, final int type, final String shopid, final String category, final int count, final int page, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         if (!NetUtils.isConnected(MyApplication.getInstance())) {
             ToastUtils.showToast("无网络连接");
             return;
@@ -406,6 +406,8 @@ public class UserApi {
                 params.put("all", "1");
                 params.put("count", count + "");
                 params.put("page", page + "");
+
+                KLog.w(tag + "--> " + new Gson().toJson(params));
                 return params;
             }
         };

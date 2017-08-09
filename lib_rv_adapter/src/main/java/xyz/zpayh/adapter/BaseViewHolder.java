@@ -221,6 +221,20 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         return this;
     }
 
+    public BaseViewHolder setVisible(@IdRes int viewId, boolean visible) {
+        View view = find(viewId);
+        if (view == null){
+            return this;
+        }
+        if (visible){
+            view.setVisibility(View.VISIBLE);
+        }
+        else{
+            view.setVisibility(View.GONE);
+        }
+        return this;
+    }
+
     public BaseViewHolder setView(@IdRes int viewId, ViewCallback callback){
         if (find(viewId) != null && callback != null){
             callback.callback(find(viewId));
@@ -299,4 +313,6 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
     public TextView findText(@IdRes int textId){
         return find(textId);
     }
+
+
 }

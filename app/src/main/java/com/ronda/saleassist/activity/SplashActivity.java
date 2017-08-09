@@ -125,6 +125,9 @@ public class SplashActivity extends BaseActivty {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         ToastUtils.showToast(error.getMessage());
+                        //若网络错误则直接跳转至登录界面
+                        isSuccessOfToken = false;
+                        goNextActivity();
                     }
                 });
     }
