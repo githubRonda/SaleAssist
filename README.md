@@ -39,6 +39,8 @@ GoodsAdapter中的最后一个添加项margin失效
 
 竟然不会自动调用 onLoadMoreRequested() 回调
 
+现在突然感觉不需要上拉加载更多，下拉刷新这么复杂的逻辑。直接一次性把数据给加载完毕即可（反正数据也不算多）
+
 
 翻页
 http://blog.csdn.net/u014165119/article/details/46834265
