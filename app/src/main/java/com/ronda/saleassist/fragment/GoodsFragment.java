@@ -1,20 +1,20 @@
 package com.ronda.saleassist.fragment;
 
 import android.graphics.Color;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.support.annotation.MenuRes;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Slide;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,20 +27,21 @@ import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.ronda.saleassist.R;
 import com.ronda.saleassist.adapter.divider.DividerGridItemDecoration;
 import com.ronda.saleassist.adapter.divider.DividerItemDecoration;
 import com.ronda.saleassist.api.UserApi;
 import com.ronda.saleassist.api.volley.GsonUtil;
+import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.BaseFragment;
+import com.ronda.saleassist.base.SPHelper;
+import com.ronda.saleassist.bean.BaseBean;
 import com.ronda.saleassist.bean.Category;
 import com.ronda.saleassist.bean.CategoryBean;
 import com.ronda.saleassist.bean.GoodsBean;
 import com.ronda.saleassist.bean.SubCategory;
 import com.ronda.saleassist.local.preference.SPUtils;
-import com.ronda.saleassist.local.sqlite.table.Goods;
 import com.ronda.saleassist.utils.PaintUtil;
 import com.ronda.saleassist.utils.ToastUtils;
 import com.socks.library.KLog;
@@ -48,15 +49,10 @@ import com.socks.library.KLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import butterknife.BindView;
-import xyz.zpayh.adapter.BaseAdapter;
-import xyz.zpayh.adapter.OnItemClickListener;
 
 import static android.media.CamcorderProfile.get;
+import static com.ronda.saleassist.fragment.GoodsFragment.SELECT_POSITION;
 
 
 /**
@@ -68,36 +64,38 @@ import static android.media.CamcorderProfile.get;
 public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.RequestLoadMoreListener, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.btn_edit_order)
-    Button mBtnEditOrder;
+    Button             mBtnEditOrder;
     @BindView(R.id.btn_refresh)
-    Button mBtnRefresh;
+    Button             mBtnRefresh;
     @BindView(R.id.img_arrow_left)
-    ImageButton mImgArrowLeft;
+    ImageButton        mImgArrowLeft;
     @BindView(R.id.rv_category)
-    RecyclerView mRvCategory;
+    RecyclerView       mRvCategory;
     @BindView(R.id.recycler_view)
-    RecyclerView mRecyclerView;
+    RecyclerView       mRecyclerView;
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.btn_add)
-    Button mBtnAdd;
+    Button             mBtnAdd;
     @BindView(R.id.btn_scan_down)
-    Button mBtnScanDown;
+    Button             mBtnScanDown;
     @BindView(R.id.btn_scan_up)
-    Button mBtnScanUp;
+    Button             mBtnScanUp;
     @BindView(R.id.fragment_category)
-    LinearLayout mFragmentCategory;
+    LinearLayout       mFragmentCategory;
 
+    private String token  = SPUtils.getString(AppConst.TOKEN, "");
+    private String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
 
     private static final int ONE_SCREEN_SIZE = 36; // 表示一屏的数据。要比pageSize要小
 
     public static int SELECT_POSITION = 0; //选中的分类项
 
     private int pageCount = 0; //分页加载的页码，当前页。（加载下一页成功后，会加1）。后台是从1开始。因为前台一开始是没有数据，所以初始化为0，当第一页数据加载成功之后，才为1
-    private int pageSize = 40; //每页的大小
+    private int pageSize  = 40; //每页的大小
 
     private CategoryAdapter mCategoryAdapter;
-    private GoodsAdapter mGoodsAdapter;
+    private GoodsAdapter    mGoodsAdapter;
 
 
     @Override
@@ -110,7 +108,13 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 
         initCategoryView();
 
-        //initGoodsView();
+        initGoodsView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        VolleyUtil.getInstance().cancelPendingRequests(TAG);
     }
 
     private void initCategoryView() {
@@ -123,6 +127,8 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         mCategoryAdapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM); //设置新条目加载进来的动画方式
         mRvCategory.setAdapter(mCategoryAdapter);
 
+        // 初始化加载分类数据
+        loadCategoryData();
 
         View categoryFooterView = LayoutInflater.from(mContext).inflate(R.layout.item_category, (ViewGroup) mRecyclerView.getParent(), false);
         ((TextView) categoryFooterView.findViewById(R.id.text_category)).setText("添加分类");
@@ -131,33 +137,41 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         categoryFooterView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtils.showToast("category --> footerView");
+                //点击了“添加分类”，弹出添加对话框
+                showAddCategoryDialog();
             }
         });
 
-        loadCategoryData();
 
         mCategoryAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 ToastUtils.showToast("position: " + position);
+
+                if (SELECT_POSITION == position) {
+                    return;
+                }
+
                 SELECT_POSITION = position;
-                mCategoryAdapter.notifyDataSetChanged();
+                mCategoryAdapter.notifyDataSetChanged();//改变背景
+
+                //切换类别，请求第一页数据
+                mSwipeRefreshLayout.setRefreshing(true);
+                loadGoodsData(mCategoryAdapter.getData().get(SELECT_POSITION).getId(), 1);
             }
         });
 
         mCategoryAdapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
-                ToastUtils.showToast("long press position: " + position);
-                return false;
+                //长按了相关类别，弹出修改和删除的菜单对话框
+                showCategoryMenuDialog(position);
+                return true;
             }
         });
     }
 
     private void initGoodsView() {
-
-        KLog.d("initGoodsView === ");
 
         mSwipeRefreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -187,8 +201,165 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 
     }
 
-    //===================后台相关===================
+    /**
+     * 显示添加主分类的对话框
+     */
+    private void showAddCategoryDialog() {
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity()).create();
+        dialog.show();
 
+        dialog.getWindow().setContentView(R.layout.dialog_add_category);
+        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
+        Button btn_confirm = (Button) dialog.getWindow().findViewById(R.id.btn_confirm);
+        Button btn_cancel = (Button) dialog.getWindow().findViewById(R.id.btn_cancel);
+
+        final EditText edit_name = (EditText) dialog.getWindow().findViewById(R.id.edit_name);
+        final EditText edit_notes = (EditText) dialog.getWindow().findViewById(R.id.edit_notes);
+
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        btn_confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = edit_name.getText().toString().trim();
+                String notes = edit_notes.getText().toString().trim();
+                if (TextUtils.isEmpty(name)) {
+                    ToastUtils.showToast("类名不可为空");
+                    return;
+                }
+
+
+                dialog.dismiss();
+
+
+                //更新后台数据库，并且当更新后台数据成功时，还会再次初始化主分类的数据
+                addCategory(name, notes);
+            }
+        });
+    }
+
+    /**
+     * 显示修改和删除主分类的对话框
+     */
+    private void showCategoryMenuDialog(final int position) {
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity()).create();
+        dialog.show();
+        dialog.getWindow().setContentView(R.layout.dialog_menu_category);
+        //alertDialogDelete.setCanceledOnTouchOutside(false);
+
+        Button btn_modify = (Button) dialog.getWindow().findViewById(R.id.btn_modify);
+        Button btn_delete = (Button) dialog.getWindow().findViewById(R.id.btn_delete);
+
+        btn_modify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showModifyCategoryDialog(position);
+                dialog.dismiss();
+            }
+        });
+
+        btn_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDeleteCategoryDialog(position);
+                dialog.dismiss();
+            }
+        });
+    }
+
+    /**
+     * 显示修改主分类的对话框
+     */
+    private void showModifyCategoryDialog(final int position) {
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity()).create();
+
+        //由于是自定义的Dialog，所以需要自定义一个编辑框才可以弹出输入法
+        dialog.setView(new EditText(getActivity()));
+
+        dialog.show();
+        dialog.getWindow().setContentView(R.layout.dialog_modify_category); //重用布局文件
+
+        Button btn_confirm = (Button) dialog.getWindow().findViewById(R.id.btn_confirm);
+        Button btn_cancel = (Button) dialog.getWindow().findViewById(R.id.btn_cancel);
+
+        final EditText edit_name = (EditText) dialog.getWindow().findViewById(R.id.edit_name);
+        final EditText edit_notes = (EditText) dialog.getWindow().findViewById(R.id.edit_notes);
+
+        edit_name.setText(mCategoryAdapter.getData().get(position).getName());
+        edit_notes.setText(mCategoryAdapter.getData().get(position).getNotes());
+
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        btn_confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = edit_name.getText().toString().trim();
+                String notes = edit_notes.getText().toString().trim();
+
+                if (TextUtils.isEmpty(name)) {
+                    ToastUtils.showToast("类名不可为空");
+                    return;
+                }
+
+                String id = mCategoryAdapter.getData().get(position).getId();
+                //更新后台数据库和前端界面
+                modifyCategory(id, name, notes, position);
+
+                dialog.dismiss();
+            }
+        });
+    }
+
+    /**
+     * 显示删除主分类的对话框
+     *
+     * @param position 主分类的position，删除的时候根据position获取到主分类的id然后删除
+     */
+    private void showDeleteCategoryDialog(final int position) {
+        final AlertDialog alertDialogDelete = new AlertDialog.Builder(getActivity()).create();
+        alertDialogDelete.show();
+        alertDialogDelete.getWindow().setContentView(R.layout.dialog_delete_category);
+
+        TextView tv_msg = (TextView) alertDialogDelete.getWindow().findViewById(R.id.tv_msg);
+        tv_msg.setText("确定删除 \"" + mCategoryAdapter.getData().get(position).getName() + "\" 这条记录吗？");
+
+        alertDialogDelete.setCanceledOnTouchOutside(false);
+
+        Button btn_confirm = (Button) alertDialogDelete.getWindow().findViewById(R.id.btn_confirm);
+        Button btn_cancel = (Button) alertDialogDelete.getWindow().findViewById(R.id.btn_cancel);
+
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialogDelete.dismiss();
+            }
+        });
+
+        btn_confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialogDelete.dismiss();
+
+                //请求更新后台数据库，并且请求成功后，直接更新界面
+                deleteCategory(mCategoryAdapter.getData().get(position).getId(), position); //从数据库中删除指定Id的主分类数据
+            }
+        });
+    }
+
+
+    //===================后台相关===================
 
     //--------OnRefreshListener-------------
     @Override
@@ -217,10 +388,10 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
      */
     private void loadCategoryData() {
 
-        String token = SPUtils.getString(AppConst.TOKEN, "");
-        String shopid = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
+        //加载分类数据时,要禁用货物的下拉刷新功能, 等加载成功之后恢复
+        mSwipeRefreshLayout.setEnabled(false);
 
-        UserApi.getCategoryInfo(TAG, token, shopid,
+        UserApi.getCategoryInfo(TAG, token, shopId,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -234,7 +405,11 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 
                         //再初始化第一个主分类下的子类别的数据
                         if (mCategoryAdapter.getData().size() != 0) {
-                            initGoodsView(); // 分类数据加载完毕后，初始化Goods相关的View。
+                            mSwipeRefreshLayout.setEnabled(true);
+
+                            // TODO: 17-8-10 个人看法：分类一旦修改重新加载之后, SELECT_POSITION 和 pageCount 都要恢复初始值
+                            SELECT_POSITION = 0;
+                            pageCount = 0;
                             loadGoodsData(mCategoryAdapter.getData().get(SELECT_POSITION).getId(), pageCount + 1);// 分类数据加载完毕后，加载货物数据
                         }
                     }
@@ -256,8 +431,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
      */
     private void loadGoodsData(String categoryId, final int page) {
 
-        String token = SPUtils.getString(AppConst.TOKEN, "");
-        String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
         UserApi.getGoodsInfo(TAG, token, 1, shopId, categoryId, pageSize, page, // 1为id升序 2为id降序 3为价格升序 4为价格降序
                 new Response.Listener<String>() {
                     @Override
@@ -316,7 +489,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 
                         mGoodsAdapter.setEnableLoadMore(true);//启用加载更多
                         mSwipeRefreshLayout.setEnabled(true);//启用下拉刷新
-                        if (mSwipeRefreshLayout.isRefreshing()){
+                        if (mSwipeRefreshLayout.isRefreshing()) {
                             mSwipeRefreshLayout.setRefreshing(false);
                         }
 
@@ -330,7 +503,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
                         mGoodsAdapter.loadMoreFail();
                         mGoodsAdapter.setEnableLoadMore(true);//启用加载更多
                         mSwipeRefreshLayout.setEnabled(true);//启用下拉刷新
-                        if (mSwipeRefreshLayout.isRefreshing()){
+                        if (mSwipeRefreshLayout.isRefreshing()) {
                             mSwipeRefreshLayout.setRefreshing(false);
                         }
                     }
@@ -339,6 +512,101 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         );
 
     }
+
+    /**
+     * 添加主分类
+     *
+     * @param name  主分类的名字
+     * @param notes 主分类的备注
+     */
+    private void addCategory(String name, String notes) {
+
+        UserApi.addCategory(TAG, token, shopId, name, notes,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        BaseBean bean = GsonUtil.getGson().fromJson(response, BaseBean.class);
+
+                        if (bean.getStatus() != 1) {
+                            ToastUtils.showToast(bean.getMsg());
+                            return;
+                        }
+
+                        //若添加成功, 则需要再次加载数据
+                        loadCategoryData();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        ToastUtils.showToast("添加失败");
+                    }
+                }
+
+        );
+    }
+
+    /**
+     * 修改主分类
+     */
+    private void modifyCategory(final String categoryId, final String name, final String notes, final int position) {
+
+        UserApi.updateCategory(TAG, token, shopId, name, notes, categoryId,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        KLog.json(response);
+
+                        BaseBean bean = GsonUtil.getGson().fromJson(response, BaseBean.class);
+
+                        if (bean.getStatus() != 1) {
+                            ToastUtils.showToast(bean.getMsg());
+                            return;
+                        }
+
+                        //对于修改就直接本地更新
+                        mCategoryAdapter.getData().set(position, new Category(categoryId, name, notes));
+                        mCategoryAdapter.notifyItemChanged(position);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        ToastUtils.showToast("修改失败");
+                    }
+                });
+    }
+
+    /**
+     * 删除相应的主分类
+     */
+    private void deleteCategory(String categoryId, final int position) {
+
+        UserApi.deleteCategory(TAG, token, shopId, categoryId,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        BaseBean bean = GsonUtil.getGson().fromJson(response, BaseBean.class);
+
+                        if (bean.getStatus() != 1) {
+                            ToastUtils.showToast(bean.getMsg());
+                            return;
+                        }
+
+                        //本地更新界面数据
+                        mCategoryAdapter.getData().remove(position);
+                        mCategoryAdapter.notifyItemRemoved(position);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        ToastUtils.showToast("删除失败");
+                    }
+                });
+    }
+
+    //==========内部类============
 
     /**
      * 分类的适配器
