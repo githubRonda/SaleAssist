@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.ronda.saleassist.view.RadioGroupEx
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/radio_group_ex"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#d3d3d3"
+    android:checkedButton="@+id/rbtn_kg"
+    android:orientation="horizontal">
+
+    <RadioButton
+        android:id="@+id/rbtn_kg"
+        style="@style/RbStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="元/kg"
+        android:textSize="18dp"/>
+
+    <RadioButton
+        android:id="@+id/rbtn_ge"
+        style="@style/RbStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="元/个"
+        android:textSize="18dp"/>
+
+    <RadioButton
+        android:id="@+id/rbtn_ping"
+        style="@style/RbStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="元/瓶"
+        android:textSize="18dp"/>
+
+
+    <RadioButton
+        android:id="@+id/rbtn_fen"
+        style="@style/RbStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="元/份"
+        android:textSize="18dp"/>
+
+    <RadioButton
+        android:id="@+id/rbtn_xiang"
+        style="@style/RbStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="元/箱"
+        android:textSize="18dp"/>
+
+</com.ronda.saleassist.view.RadioGroupEx>

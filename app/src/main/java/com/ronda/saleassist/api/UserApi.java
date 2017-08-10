@@ -33,7 +33,7 @@ import static android.R.attr.type;
 public class UserApi {
 
     private static final String OFFICIAL_SERVER = "http://ceshi.edianlai.com";
-    public static        String BASE_SERVER     = OFFICIAL_SERVER;
+    public static String BASE_SERVER = OFFICIAL_SERVER;
 
 
     private static final String TAG = UserApi.class.getSimpleName();
@@ -175,13 +175,13 @@ public class UserApi {
      * 5. 图片上传
      *
      * @param tag
-     * @param photo
-     * @param type
+     * @param photo         图片文件（base64编码）
+     * @param type          图片类型（暂定： 1头像 2身份证照片 3营业执照 4商品图片 5企业logo）
      * @param shopid
      * @param listener
      * @param errorListener
      */
-    public static void uploadPhoto(String tag, final String token, final String photo, final int type, final String shopid, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    public static void uploadPhoto(String tag, final String token, final String shopid, final String photo, final int type, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         if (!NetUtils.isConnected(MyApplication.getInstance())) {
             ToastUtils.showToast("无网络连接");
             return;
@@ -446,7 +446,7 @@ public class UserApi {
             return;
         }
 
-        StringRequest strReq = new StringRequest(Request.Method.POST, "/market/api/shop_goods_category_upload", listener, errorListener) {
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_goods_category_upload", listener, errorListener) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();

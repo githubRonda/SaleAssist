@@ -69,4 +69,11 @@ public class Category implements Serializable {
     public void setShopid(String shopid) {
         this.shopid = shopid;
     }
+
+
+    // 修改货物时LSpinner会使用
+    @Override
+    public String toString() {
+        return name;
+    }
 }

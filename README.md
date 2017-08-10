@@ -45,6 +45,14 @@ GoodsAdapter中的最后一个添加项margin失效
 
 现在突然感觉不需要上拉加载更多，下拉刷新这么复杂的逻辑。直接一次性把数据给加载完毕即可（反正数据也不算多）
 
+有时间把 DropEditText 给优化一下
+
+选择图片还可以在优化（参考毕设）
+
+Activity.startActivityForResult(intent, requestCode)  --> 只会回调此Activity中的 onActivityResult(requestCode, resultCode, Intent) 方法
+Fragment.startActivityForResult(intent, requestCode)  --> 既会回调此Fragment中的 onActivityResult() 方法，也会回调宿主Activity中的 onActivityResult() 方法，不过一般不使用宿主Activity中的回调，因为其requestCode是错误的(值始终是65536)
+一句话：谁启动的，就在谁内部进行回调
+
 
 翻页
 http://blog.csdn.net/u014165119/article/details/46834265

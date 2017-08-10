@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:drop="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/transparent"
+              android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="280dip"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/round_rect_white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dip">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="添加菜品"
+                android:textColor="@color/red"
+                android:textSize="18sp"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="@color/divider"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dip">
+
+            <EditText
+                android:id="@+id/edit_name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:hint="菜品名"
+                android:text=""
+                android:textColor="@color/gray"
+                android:textSize="15sp"/>
+
+            <EditText
+                android:id="@+id/edit_price"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:focusableInTouchMode="true"
+                android:hint="单价"
+                android:inputType="numberDecimal"
+                android:text=""
+                android:textColor="@color/gray"
+                android:textSize="15sp"/>
+
+
+            <include layout="@layout/include_radio_group_unit"/>
+
+            <ImageView
+                android:id="@+id/img_pic"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/img_add_subcategory"/>
+
+            <!--折扣 edittext输入的形式，隐藏掉-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/edit_discount2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="1"
+                    android:focusableInTouchMode="true"
+                    android:hint="折扣1(可不写)"
+                    android:inputType="numberDecimal"
+                    android:text=""
+                    android:textColor="@color/gray"
+                    android:textSize="15sp"/>
+
+                <EditText
+                    android:id="@+id/edit_discount3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="1"
+                    android:focusableInTouchMode="true"
+                    android:hint="折扣2(可不写)"
+                    android:inputType="numberDecimal"
+                    android:text=""
+                    android:textColor="@color/gray"
+                    android:textSize="15sp"/>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/edit_notes"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="备注（可不填写）"
+                android:textColor="@color/gray"
+                android:textSize="15sp"/>
+
+            <!--复选框 是否显示折扣-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="允许折扣"
+                    android:textColor="@color/gray"/>
+            </LinearLayout>
+
+
+            <!--折扣 下拉列表（自定义的，可输入的）的形式-->
+            <LinearLayout
+                android:id="@+id/discount_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="折扣1"
+                        android:visibility="visible"/>
+
+                    <!--<org.loader.view.DropEditText
+                        android:id="@+id/drop_edit_discount2"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        drop:drawableRight="@drawable/drop"
+                        drop:dropMode="flow_parent">
+
+                    </org.loader.view.DropEditText>-->
+                    <com.ronda.saleassist.view.LSpinner
+                        android:id="@+id/drop_edit_discount2"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="折扣2"
+                        android:visibility="visible"/>
+
+                    <!--<org.loader.view.DropEditText
+                        android:id="@+id/drop_edit_discount3"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        drop:drawableRight="@drawable/drop"
+                        drop:dropMode="flow_parent">
+
+                    </org.loader.view.DropEditText>-->
+                    <com.ronda.saleassist.view.LSpinner
+                        android:id="@+id/drop_edit_discount3"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dip"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="fill_parent"
+                android:layout_height="35dip"
+                android:layout_marginLeft="10dip"
+                android:layout_marginRight="5dip"
+                android:layout_weight="1"
+                android:background="@drawable/selecter_button"
+                android:text="取消"
+                android:textColor="@color/white"
+                android:textSize="14sp"/>
+
+            <Button
+                android:id="@+id/btn_confirm"
+                android:layout_width="fill_parent"
+                android:layout_height="35dip"
+                android:layout_marginLeft="5dip"
+                android:layout_marginRight="10dip"
+                android:layout_weight="1"
+                android:background="@drawable/selecter_button"
+                android:text="确定"
+                android:textColor="@color/white"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

@@ -42,4 +42,6 @@ public interface AppConst {
      * 当前店铺的id
      */
     String CUR_SHOP_ID = "cur_shop_id";
+
+
 }
