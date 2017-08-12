@@ -250,7 +250,7 @@ public class UserApi {
     }
 
     /**
-     * 8. 货物入库(配合图片上传一起使用)
+     * 8. 货物入库 添加商品 (配合图片上传一起使用)
      *
      * @param shopid   店铺id
      * @param name     货物名称
@@ -288,6 +288,8 @@ public class UserApi {
                 params.put("unit", unit);
                 params.put("stock", "0");//库存, 新建一个菜是，库存为0
 
+                MapRemoveNullUtil.removeNullAndEmptyValue(params);
+
                 return params;
             }
         };
@@ -324,7 +326,7 @@ public class UserApi {
     //修改菜品
     public static void updateGood(String tag, String token, String shopid, String categoryId, String goodId, String name, String price, String photoId,
                                   String discount2, String discount3, String intro, String method, String unit, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        goodsEdit(tag,token, 1, shopid, categoryId, goodId, name, price, photoId, discount2, discount3, intro, method, unit, listener, errorListener);
+        goodsEdit(tag, token, 1, shopid, categoryId, goodId, name, price, photoId, discount2, discount3, intro, method, unit, listener, errorListener);
     }
 
 
@@ -375,6 +377,8 @@ public class UserApi {
 
                 params.put("method", method);
                 params.put("unit", unit);
+
+                MapRemoveNullUtil.removeNullAndEmptyValue(params);
 
                 KLog.w(tag + "--> " + new Gson().toJson(params));
                 return params;

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/ll_keyboard"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="horizontal">
+    <!--0~9数字键-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/digitkeypad_7"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:text="@string/digitKeyppad_seven"
+                android:textSize="12sp"/>
+
+            <Button
+                android:id="@+id/digitkeypad_8"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:text="@string/digitKeyppad_eight"
+                android:textSize="12sp"/>
+
+            <Button
+                android:id="@+id/digitkeypad_9"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:text="@string/digitKeyppad_nine"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/digitkeypad_4"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:text="@string/digitKeyppad_four"
+                android:textSize="12sp"/>
+
+            <Button
+                android:id="@+id/digitkeypad_5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:text="@string/digitKeyppad_five"
+                android:textSize="12sp"/>
+
+            <Button
+                android:id="@+id/digitkeypad_6"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:text="@string/digitKeyppad_six"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/digitkeypad_1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:gravity="center"
+                android:text="@string/digitKeyppad_one"
+                android:textSize="12sp"/>
+
+            <Button
+                android:id="@+id/digitkeypad_2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:gravity="center"
+                android:text="@string/digitKeyppad_two"
+                android:textSize="12sp"/>
+
+            <Button
+                android:id="@+id/digitkeypad_3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:gravity="center"
+                android:text="@string/digitKeyppad_three"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/digitkeypad_0"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:text="@string/digitKeyppad_zero"
+                android:textSize="12sp"/>
+
+            <Button
+                android:id="@+id/digitkeypad_point"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:gravity="center"
+                android:text="@string/digitKeyppad_point"
+                android:textSize="12sp"
+                android:textStyle="bold"/>
+
+            <ImageButton
+                android:id="@+id/digitkeypad_clear"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_keyboard_btn"
+                android:src="@mipmap/keyboard_delete"
+                android:textSize="12sp"/>
+        </LinearLayout>
+    </LinearLayout>
+    <!--退格键和完成键-->
+    <!--<LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_keyboard_btn"
+            android:src="@mipmap/keyboard_delete"
+            android:textSize="12sp"/>
+
+        <Button
+            android:id="@+id/digitkeypad_ok"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_keyboard_btn"
+            android:text="@string/digitKeyppad_ok"
+            android:textSize="12sp"/>
+    </LinearLayout>-->
+</LinearLayout>

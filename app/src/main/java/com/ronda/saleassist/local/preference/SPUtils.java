@@ -96,6 +96,11 @@ public class SPUtils {
         return bean;
     }
 
+    public static <T> T getBean(String tag, Class<T> clazz, T defValue) {
+        T bean = new Gson().fromJson(getString(tag, new Gson().toJson(defValue)), clazz);
+        return bean;
+    }
+
 
     /**
      * 保存和读取List<JavaBean>

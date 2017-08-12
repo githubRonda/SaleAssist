@@ -1,6 +1,5 @@
 package com.ronda.saleassist.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -87,6 +86,20 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
         });
     }
 
+
+    // 展开侧边栏，在GoodsFragment中调用
+    public void openDrawer() {
+        if (!mDrawerLayout.isDrawerOpen(mNavView)) {
+            mDrawerLayout.openDrawer(mNavView);
+        }
+    }
+
+    // 收起侧边栏
+    public void closeDrawer() {
+        if (mDrawerLayout.isDrawerOpen(mNavView)) {
+            mDrawerLayout.closeDrawer(mNavView);
+        }
+    }
 
     //================OnNavigationItemSelectedListener====================
     @Override

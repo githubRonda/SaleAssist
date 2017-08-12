@@ -14,6 +14,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,9 +35,13 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
+import com.chad.library.adapter.base.BaseItemDraggableAdapter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
+import com.google.gson.Gson;
 import com.ronda.saleassist.R;
+import com.ronda.saleassist.activity.MainActivity;
 import com.ronda.saleassist.adapter.divider.DividerGridItemDecoration;
 import com.ronda.saleassist.adapter.divider.DividerItemDecoration;
 import com.ronda.saleassist.api.UserApi;
@@ -44,16 +49,23 @@ import com.ronda.saleassist.api.volley.GsonUtil;
 import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.BaseFragment;
+import com.ronda.saleassist.base.SPHelper;
 import com.ronda.saleassist.bean.BaseBean;
 import com.ronda.saleassist.bean.CartBean;
 import com.ronda.saleassist.bean.Category;
 import com.ronda.saleassist.bean.CategoryBean;
 import com.ronda.saleassist.bean.GoodsBean;
+import com.ronda.saleassist.bean.GoodsOrder;
+import com.ronda.saleassist.bean.GoodsStyle;
 import com.ronda.saleassist.bean.SubCategory;
+import com.ronda.saleassist.dialog.GoodsStyleDialog;
 import com.ronda.saleassist.local.preference.SPUtils;
+import com.ronda.saleassist.local.sqlite.table.Goods;
 import com.ronda.saleassist.utils.Base64Encoder;
+import com.ronda.saleassist.utils.MathCompute;
 import com.ronda.saleassist.utils.PaintUtil;
 import com.ronda.saleassist.utils.ToastUtils;
+import com.ronda.saleassist.view.DigitKeyboardView;
 import com.ronda.saleassist.view.LSpinner;
 import com.ronda.saleassist.view.RadioGroupEx;
 import com.socks.library.KLog;
@@ -64,11 +76,12 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
@@ -124,6 +137,9 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     private String imgId; // 上传图片返回的图片id
 
 
+    private ItemTouchHelper itemTouchHelper; // 便于移动
+    private ItemTouchHelper mItemTouchHelper;
+
     @Override
     public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_main_goods, container, false);
@@ -135,6 +151,12 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         initCategoryView();
 
         initGoodsView();
+
+        initGoodsEvent();
+
+        initDragGoodsEvent();
+
+
     }
 
     @Override
@@ -214,8 +236,20 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         View goodsFooterView = LayoutInflater.from(mContext).inflate(R.layout.item_goods_add, (ViewGroup) mRecyclerView.getParent(), false);
         mGoodsAdapter.addFooterView(goodsFooterView);
 
+        //设置适配器
         mRecyclerView.setAdapter(mGoodsAdapter);
 
+
+        //添加货物事件
+        goodsFooterView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAddSubCategoryDialog();
+            }
+        });
+    }
+
+    private void initGoodsEvent() {
         mGoodsAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
@@ -258,16 +292,17 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
                 return true;
             }
         });
-
-        goodsFooterView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddSubCategoryDialog();
-            }
-        });
-
     }
 
+    /**
+     * 拖拽事件
+     */
+    public void initDragGoodsEvent() {
+        ItemDragAndSwipeCallback mItemDragAndSwipeCallback = new ItemDragAndSwipeCallback(mGoodsAdapter);
+        mItemTouchHelper = new ItemTouchHelper(mItemDragAndSwipeCallback);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+        //mGoodsAdapter.setOnItemDragListener(listener);//不需要监听拖拽事件
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -341,21 +376,58 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     }
 
 
-
-    @OnClick({R.id.btn_edit_order, R.id.btn_add, R.id.btn_scan_down, R.id.btn_scan_up})
+    @OnClick({R.id.img_arrow_left, R.id.btn_edit_order, R.id.btn_add, R.id.btn_scan_down, R.id.btn_scan_up})
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.img_arrow_left:
+                ((MainActivity) getActivity()).openDrawer();
+                break;
             case R.id.btn_edit_order:
+                doEditOrder();
                 break;
             case R.id.btn_add:
+                showAddDialog();
                 break;
             case R.id.btn_scan_down:
+                doGoodsSurface();
                 break;
             case R.id.btn_scan_up:
                 break;
         }
     }
 
+    /**
+     * 点击修改顺序
+     */
+    private void doEditOrder() {
+        if ("排序".equals(mBtnEditOrder.getText())) {
+            mBtnEditOrder.setText("完成");
+            for (SubCategory item : mGoodsAdapter.getData()) {
+                item.setMoving(true);
+            }
+            mGoodsAdapter.notifyDataSetChanged();
+
+            //清空点击，长按，下拉刷新事件的影响
+            mGoodsAdapter.setOnItemClickListener(null);
+            mGoodsAdapter.setOnItemLongClickListener(null);
+            mSwipeRefreshLayout.setEnabled(false);
+            mGoodsAdapter.enableDragItem(mItemTouchHelper);//启用拖拽
+        } else {
+            mBtnEditOrder.setText("排序");
+            for (SubCategory item : mGoodsAdapter.getData()) {
+                item.setMoving(false);
+            }
+            mGoodsAdapter.notifyDataSetChanged();
+
+            mGoodsAdapter.disableDragItem();//停用拖拽
+            //恢复事件
+            mSwipeRefreshLayout.setEnabled(true);
+            initGoodsEvent();
+
+            //更新货物顺序
+            updateGoodsOrder();
+        }
+    }
 
     /**
      * 显示添加主分类的对话框
@@ -602,10 +674,10 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
                     return;
                 }
 
-                if (imgId == null) {
-                    Toast.makeText(getActivity(), "请为菜品选择一张图片", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+//                if (imgId == null) {
+//                    Toast.makeText(getActivity(), "请为菜品选择一张图片", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
 
                 String discount2 = checkBox.isChecked() ? dropedit_discount2.getSelectedItem() : "";
                 String discount3 = checkBox.isChecked() ? dropedit_discount2.getSelectedItem() : "";
@@ -829,6 +901,62 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         });
     }
 
+
+    /**
+     * 添加额外项
+     */
+    private void showAddDialog() {
+
+        final AlertDialog dialogAddition = new AlertDialog.Builder(getActivity()).create();
+        dialogAddition.show();
+        dialogAddition.getWindow().setContentView(R.layout.dialog_addition);
+
+        DigitKeyboardView keyboardView = (DigitKeyboardView) dialogAddition.findViewById(R.id.digit_keyboard_view);
+        Button btn_confirm = (Button) dialogAddition.getWindow().findViewById(R.id.btn_confirm);
+        Button btn_cancel = (Button) dialogAddition.getWindow().findViewById(R.id.btn_cancel);
+        final EditText edit_addition = (EditText) dialogAddition.getWindow().findViewById(R.id.edit_addition);
+
+        keyboardView.bindEditTextViews(getActivity().getWindow(), edit_addition);
+
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogAddition.dismiss();
+            }
+        });
+
+        btn_confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String addtion = edit_addition.getText().toString().trim();
+
+                if (addtion.isEmpty()) {
+                    Toast.makeText(getActivity(), "金额不能为空！", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                dialogAddition.dismiss();
+
+                CartBean cartBean = new CartBean("1000", "额外项", addtion, "1", "", "1", "", "", "0", "");
+                cartBean.setDate(System.currentTimeMillis());
+                EventBus.getDefault().post(cartBean);
+            }
+        });
+    }
+
+
+    /**
+     * 商品排列样式
+     */
+    private void doGoodsSurface() {
+        GoodsStyleDialog.newInstance("goods_style")
+                .setCallbackListener(new GoodsStyleDialog.CallbackListener() {
+                    @Override
+                    public void onCall(GoodsStyle style) {
+                        mGoodsAdapter.setStyle(style);
+                    }
+                })
+                .show(getActivity().getSupportFragmentManager(), "goods_style");
+    }
 
     //===================后台相关===================
 
@@ -1207,6 +1335,41 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     }
 
 
+    /**
+     * 上传货物顺序
+     */
+    private void updateGoodsOrder() {
+
+        List<GoodsOrder> list = new ArrayList<>();
+
+        List<SubCategory> goodsData = mGoodsAdapter.getData();
+        for (int i = 0; i < goodsData.size(); i++) {
+            list.add(new GoodsOrder(goodsData.get(i).getGoods(), i));
+        }
+
+        String data = new Gson().toJson(list);
+
+        UserApi.updateGoodsOrder(TAG, token, shopId, data, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        BaseBean bean = GsonUtil.getGson().fromJson(response, BaseBean.class);
+
+                        if (bean.getStatus() != 1) {
+                            ToastUtils.showToast(bean.getMsg());
+                            return;
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        ToastUtils.showToast(R.string.no_respnose);
+                    }
+                });
+    }
+
+
     //=================================内部类======================================
 
     /**
@@ -1233,20 +1396,69 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     /**
      * 货物的适配器
      */
-    class GoodsAdapter extends BaseQuickAdapter<SubCategory, BaseViewHolder> {
+    class GoodsAdapter extends BaseItemDraggableAdapter<SubCategory, BaseViewHolder> {
+
+        private GoodsStyle mStyle;
 
 
         public GoodsAdapter() {
-            super(R.layout.item_subcategory);
+            super(R.layout.item_subcategory, null);
+
+            // 从 SharedPreferences 中获取存储的样式设置信息
+            mStyle = SPUtils.getBean(AppConst.GOODS_STYLE, GoodsStyle.class, new GoodsStyle());
+
+            // 先在这里改变布局，然后在 convert 中改变 ItemView 样式
+            if (mRecyclerView != null && mStyle != null) {
+                mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mStyle.getColumn()));
+            }
         }
 
 
         @Override
         protected void convert(BaseViewHolder holder, SubCategory item) {
-            holder.setText(R.id.text_subcategory, item.getName() + " " + item.getPrice() + item.getUnit());
-            Glide.with(mContext)
-                    .load(UserApi.BASE_SERVER + item.getPicurl())
-                    .into((ImageView) holder.getView(R.id.img_subcategory));
+
+            // 设置间距
+            if (mStyle != null) {
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.setMargins(mStyle.getHorizontalSpace(), mStyle.getVerticalSpace(), mStyle.getHorizontalSpace(), mStyle.getVerticalSpace());
+                holder.itemView.setLayoutParams(params);
+
+
+
+                // 设置正文字体
+                ((TextView) holder.getView(R.id.tv_plu)).setTextSize(mStyle.getTextSize());
+                ((TextView) holder.getView(R.id.tv_price)).setTextSize(mStyle.getTextSize());
+
+                //设置编码和价格显示与否
+//                if (mStyle.isShowNum()) {
+//                    holder.getView(R.id.tv_plu).setVisibility(View.VISIBLE);
+//                } else {
+//                    holder.getView(R.id.tv_plu).setVisibility(View.INVISIBLE);
+//                }
+                if (mStyle.isShowPrice()) {
+                    holder.setVisible(R.id.tv_price, true);
+                } else {
+                    holder.setVisible(R.id.tv_price, false);
+                }
+
+                // 设置标题字体
+                ((TextView) holder.getView(R.id.tv_name)).setTextSize(mStyle.getTitleTextSize());
+
+                // 设置标题是否为粗体
+                ((TextView) holder.getView(R.id.tv_name)).getPaint().setFakeBoldText(mStyle.isBold());
+            }
+
+
+            //holder.setText(R.id.tv_plu, item.getNumber());
+            holder.setText(R.id.tv_name, item.getName());
+            holder.setText(R.id.tv_price, item.getPrice() + item.getUnit());
+
+
+
+//            holder.setText(R.id.text_subcategory, item.getName() + " " + item.getPrice() + item.getUnit());
+//            Glide.with(mContext)
+//                    .load(UserApi.BASE_SERVER + item.getPicurl())
+//                    .into((ImageView) holder.getView(R.id.img_subcategory));
 
             if ("1".equals(item.getMethod())) {
                 holder.setVisible(R.id.img_num, true);
@@ -1274,6 +1486,16 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
             } else {
                 holder.setBackgroundColor(R.id.ll_content, Color.TRANSPARENT);
             }
+        }
+
+
+        public void setStyle(GoodsStyle style) {
+            mStyle = style;
+            // 分两步：1.改变RecyclerView的布局；2.改变ItemView的样式
+            if (mRecyclerView != null) {
+                mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), mStyle.getColumn()));
+            }
+            notifyDataSetChanged();
         }
     }
 }

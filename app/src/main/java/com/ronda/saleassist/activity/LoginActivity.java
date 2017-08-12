@@ -236,7 +236,17 @@ public class LoginActivity extends BaseActivty {
                         }
 
                         //先清空
-                        SPUtils.clear();
+                        //SPUtils.clear();//其他信息不能清空（进制，GoodsStyle）
+                        SPUtils.remove(AppConst.TOKEN);
+                        SPUtils.remove(AppConst.MOBILE);
+                        SPUtils.remove(AppConst.NICK_NAME);
+                        SPUtils.remove(AppConst.USER_ID);
+                        SPUtils.remove(AppConst.LOGIN_SHOP_LIST);
+                        SPUtils.remove(AppConst.CUR_SHOP_ID);
+                        SPUtils.remove(AppConst.CUR_SHOP_NAME);
+                        SPUtils.remove(AppConst.SUPPORT_ALIPAY);
+                        SPUtils.remove(AppConst.SUPPORT_WECHATPAY);
+
 
                         //保存信息到SharedPreference中
                         SPUtils.putString(AppConst.TOKEN, response.getData().getToken());

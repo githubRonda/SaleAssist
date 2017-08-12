@@ -15,7 +15,7 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <ImageView
+        <!--<ImageView
             android:id="@+id/img_subcategory"
             android:layout_width="80dp"
             android:layout_height="80dp"
@@ -30,8 +30,38 @@
             android:gravity="center"
             android:textColor="@color/gray"
             android:textSize="14sp"
-            tools:text="添加菜品"/>
-        <!--把TextView 的height设为match_parent, 可以避免因文本换行出现的高度不一致而错位的情况-->
+            tools:text="添加菜品"/>-->
+
+        <!--编号, 相当于PLU编号-->
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_plu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:textSize="16sp"
+            tools:text="2210"
+            />
+
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:textSize="24sp"
+            tools:textStyle="bold"
+            tools:text="苹果"
+            />
+
+        <TextView
+            android:id="@+id/tv_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:textSize="16sp"
+            tools:text="4.10"
+            />
 
     </LinearLayout>
 

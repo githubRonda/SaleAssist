@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--digitKeyboard-->
+    <declare-styleable name="DigitKeyboardView">
+        <attr name="digitTextSize" format="dimension"/>
+        <attr name="digitTextColor" format="color"/>
+        <attr name="digitBackground" format="reference|color"/><!--这个属性暂时没用上-->
+    </declare-styleable>
+</resources>

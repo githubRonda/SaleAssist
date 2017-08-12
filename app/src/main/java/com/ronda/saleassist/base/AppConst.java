@@ -71,4 +71,9 @@ public interface AppConst {
     int TYPE_TOTAL_5 = 4;
 
 
+    /**
+     * 商品排列样式
+     */
+
+    String GOODS_STYLE = "goods_style";
 }

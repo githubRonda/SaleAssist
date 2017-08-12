@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">秤心plus</string>
+    <string name="app_name">秤心助手</string>
     <string name="drawer_open">open drawer</string>
     <string name="drawer_close">close drawer</string>
 
@@ -27,6 +27,25 @@
     <string name="input_password_again">请再次输入密码</string>
     <string name="input_user_name">用户名/手机号</string>
     <string name="login">登录</string>
+
+
+
+
+    <!--浮动数字键盘-->
+    <string name="digitKeyppad_one">1</string>
+    <string name="digitKeyppad_two">2</string>
+    <string name="digitKeyppad_three">3</string>
+    <string name="digitKeyppad_four">4</string>
+    <string name="digitKeyppad_five">5</string>
+    <string name="digitKeyppad_six">6</string>
+    <string name="digitKeyppad_seven">7</string>
+    <string name="digitKeyppad_eight">8</string>
+    <string name="digitKeyppad_nine">9</string>
+    <string name="digitKeyppad_zero">0</string>
+    <string name="digitKeyppad_point">.</string>
+    <string name="digitKeyppad_delete"><![CDATA[<<]]></string>
+    <string name="digitKeyppad_ok">确定</string>
+
 
 
 </resources>

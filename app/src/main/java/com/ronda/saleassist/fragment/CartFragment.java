@@ -59,8 +59,7 @@ import butterknife.OnClick;
  */
 
 public class CartFragment extends BaseFragment {
-    @BindView(R.id.spinner_save)
-    Spinner mSpinnerSave;
+
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.txt_total)
