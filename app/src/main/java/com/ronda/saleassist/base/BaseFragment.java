@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.ronda.saleassist.base.dialog.DialogFactory;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -24,6 +26,8 @@ public abstract class BaseFragment extends Fragment {
     protected Context mContext;
     protected View    mRootView;
 
+    protected DialogFactory mDialogFactory;
+
     private Unbinder unbinder;
 
     @Override
@@ -34,6 +38,8 @@ public abstract class BaseFragment extends Fragment {
         if (bundle != null) {
             mArgument = bundle.getString(ARGUMENT);
         }
+
+        mDialogFactory = new DialogFactory(getActivity().getSupportFragmentManager()); // getChildFragmentManager() 这个是v4包下的
     }
 
     @Override

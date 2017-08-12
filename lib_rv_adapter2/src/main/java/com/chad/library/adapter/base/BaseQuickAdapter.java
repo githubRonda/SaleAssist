@@ -580,6 +580,11 @@ public abstract class BaseQuickAdapter<T, K extends BaseViewHolder> extends Recy
         notifyDataSetChanged();
     }
 
+    public void clearData(){
+        mData.clear();
+        notifyDataSetChanged();
+    }
+
     /**
      * compatible getLoadMoreViewCount and getEmptyViewCount may change
      *

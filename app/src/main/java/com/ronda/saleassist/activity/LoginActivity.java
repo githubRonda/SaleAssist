@@ -245,6 +245,9 @@ public class LoginActivity extends BaseActivty {
                         SPUtils.putString(AppConst.USER_ID, response.getData().getMobile());
                         SPUtils.putList(AppConst.LOGIN_SHOP_LIST, response.getData().getShopinfo());
                         SPUtils.putString(AppConst.CUR_SHOP_ID, response.getData().getShopinfo().get(0).getShopid()); // 默认当前店铺为第一个店铺
+                        SPUtils.putString(AppConst.CUR_SHOP_NAME, response.getData().getShopinfo().get(0).getShopname());
+                        SPUtils.putBoolean(AppConst.SUPPORT_ALIPAY, response.getData().getShopinfo().get(0).getAlipay_check() == 1); //等于1说明开通
+                        SPUtils.putBoolean(AppConst.SUPPORT_WECHATPAY, response.getData().getShopinfo().get(0).getWechatpay_check() == 1);
 
                         // 结束当前Activity 并 跳转
                         AppManager.getInstance().finishAllActivity();

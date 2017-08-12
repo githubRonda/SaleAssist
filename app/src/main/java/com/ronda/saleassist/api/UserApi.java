@@ -322,15 +322,15 @@ public class UserApi {
     }
 
     //修改菜品
-    public static void updateGood(String tag, String shopid, String categoryId, String goodId, String name, String price, String photoId,
+    public static void updateGood(String tag, String token, String shopid, String categoryId, String goodId, String name, String price, String photoId,
                                   String discount2, String discount3, String intro, String method, String unit, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        goodsEdit(tag, 1, shopid, categoryId, goodId, name, price, photoId, discount2, discount3, intro, method, unit, listener, errorListener);
+        goodsEdit(tag,token, 1, shopid, categoryId, goodId, name, price, photoId, discount2, discount3, intro, method, unit, listener, errorListener);
     }
 
 
     //删除菜品
-    public static void deleteGood(String tag, String shopid, String categoryId, String goodId, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        goodsEdit(tag, 2, shopid, categoryId, goodId, "", "", "", "", "", "", "", "", listener, errorListener);
+    public static void deleteGood(String tag, String token, String shopid, String categoryId, String goodId, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        goodsEdit(tag, token, 2, shopid, categoryId, goodId, "", "", "", "", "", "", "", "", listener, errorListener);
     }
 
     /**
@@ -349,7 +349,7 @@ public class UserApi {
      */
 
     /*Volley版*/
-    private static void goodsEdit(final String tag, final int type, final String shopid, final String category, final String goods, final String name, final String price,
+    private static void goodsEdit(final String tag, final String token, final int type, final String shopid, final String category, final String goods, final String name, final String price,
                                   final String photo, final String discount2, final String discount3, final String intro,
                                   final String method, final String unit, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         if (!NetUtils.isConnected(MyApplication.getInstance())) {
@@ -361,7 +361,7 @@ public class UserApi {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("token", SPHelper.getLoginToken());
+                params.put("token", token);
                 params.put("type", type + "");
                 params.put("shopid", shopid);
                 params.put("goods", goods);

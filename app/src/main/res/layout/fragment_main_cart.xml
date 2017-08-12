@@ -32,19 +32,20 @@
             android:layout_marginRight="2dp"
             android:layout_weight="1"
             android:background="@drawable/selector_subcategory_bottom_btn"
-            android:text="保存订单"
+            android:text="存单"
             android:textSize="12sp"
             />
-
-        <Spinner
-            android:id="@+id/spinner_save"
+        <Button
+            android:id="@+id/btn_get_order"
             android:layout_width="0dp"
             android:layout_height="35dp"
+            android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
             android:layout_weight="1"
             android:background="@drawable/selector_subcategory_bottom_btn"
-            >
-        </Spinner>
+            android:text="取单(0)"
+            android:textSize="12sp"
+            />
 
         <Button
             android:id="@+id/btn_clear"
@@ -132,20 +133,34 @@
         android:paddingTop="10dp"
         >
 
-        <TextView
-            android:id="@+id/txt_total"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/ll_total"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:gravity="center"
-            android:text="合计"
-            android:textSize="32sp"
-            />
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:gravity="center"
+                android:text="合计："
+                android:textSize="32sp"
+                />
+
+            <TextView
+                android:id="@+id/txt_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0.00"
+                android:textSize="32sp"
+                />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txt_total"
+            android:layout_below="@id/ll_total"
             android:layout_centerVertical="true"
             android:layout_marginTop="5dp"
             android:gravity="center"

@@ -1,5 +1,7 @@
 package com.ronda.saleassist.bean;
 
+import android.text.TextUtils;
+
 import java.io.Serializable;
 
 /**
@@ -114,7 +116,7 @@ public class SubCategory implements Serializable {
     }
 
     public String getUnit() {
-        if (null == unit){
+        if (null == unit) {
             return "";
         }
         return unit.replace("\\", "");
@@ -196,20 +198,24 @@ public class SubCategory implements Serializable {
         this.intime = intime;
     }
 
-    public boolean getDiscount1Enable(){
-        if (discount1 == null ||discount1.equals("0")|| discount1.isEmpty())//真正判断的就是第二项是否等于0
+    public boolean getDiscount1Enable() {
+        if (discount1 == null || discount1.equals("0") || discount1.isEmpty())//真正判断的就是第二项是否等于0
             return false;
         return true;
     }
 
-    public boolean getDiscount2Enable(){
-        if (discount2 == null ||discount2.equals("0")|| discount2.isEmpty())
+    public boolean getDiscount2Enable() {
+        try {
+            if (TextUtils.isEmpty(discount2) || Double.parseDouble(discount2) == 0)
+                return false;
+        } catch (Exception e) {
             return false;
+        }
         return true;
     }
 
-    public boolean getDiscount3Enable(){
-        if (discount3 == null ||discount3.equals("0")|| discount3.isEmpty())
+    public boolean getDiscount3Enable() {
+        if (discount3 == null || discount3.equals("0") || discount3.isEmpty())
             return false;
         return true;
     }

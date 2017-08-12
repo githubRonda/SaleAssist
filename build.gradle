@@ -14,7 +14,7 @@ buildscript {
         //greenDAO gradle 插件
         classpath 'org.greenrobot:greendao-gradle-plugin:3.2.1'
 
-        // dagger2  添加android-apt 插件
+        // dagger2  添加android-apt 插件(还有：EventBus索引加速)
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 
         //banner 不过感觉不用这些插件也是可以的
@@ -46,5 +46,5 @@ ext {
 
     // dependencies
     //compile "com.android.support:appcompat-v7:${rootProject.ext.support}"
-    support = "25.0.1"
+    support = "25.0.0"
 }

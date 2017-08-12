@@ -1,16 +1,11 @@
 package com.ronda.saleassist.fragment;
 
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,7 +20,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -42,9 +36,7 @@ import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
-import com.google.gson.Gson;
 import com.ronda.saleassist.R;
-import com.ronda.saleassist.activity.MainActivity;
 import com.ronda.saleassist.adapter.divider.DividerGridItemDecoration;
 import com.ronda.saleassist.adapter.divider.DividerItemDecoration;
 import com.ronda.saleassist.api.UserApi;
@@ -53,6 +45,7 @@ import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.BaseFragment;
 import com.ronda.saleassist.bean.BaseBean;
+import com.ronda.saleassist.bean.CartBean;
 import com.ronda.saleassist.bean.Category;
 import com.ronda.saleassist.bean.CategoryBean;
 import com.ronda.saleassist.bean.GoodsBean;
@@ -65,17 +58,18 @@ import com.ronda.saleassist.view.LSpinner;
 import com.ronda.saleassist.view.RadioGroupEx;
 import com.socks.library.KLog;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
-
-import static android.media.CamcorderProfile.get;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -208,7 +202,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
         mRecyclerView.setLayoutManager(new GridLayoutManager(mContext, 6));
-//        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerGridItemDecoration(mContext));
@@ -226,14 +219,42 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         mGoodsAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (mGoodsAdapter.getData().get(position).getPrice().isEmpty() || 0 == Double.parseDouble(mGoodsAdapter.getData().get(position).getPrice())) {
+                    ToastUtils.showToast("单价为0，不能添加至货篮！");
+                    return;
+                }
 
+                // TODO: 2017/8/12/0012 这里省略掉确认对话框
+                SubCategory goods = mGoodsAdapter.getData().get(position);
+
+                String weight;
+                if ("1".equals(goods.getMethod())) { //计件类 ： 不需要获取秤端重量
+                    weight = "1";
+                } else { //称重类， 需要货物秤端的重量
+                    //weight = CommonUtil.getWeight(mBluetooth.weightStr) / 1000.0;//单位是kg
+                    weight = new DecimalFormat("0.00").format(Math.random() * 10); // 模拟一个随机值
+                }
+
+                String discount = "1";
+                if (goods.getDiscount2Enable()) {
+                    discount = goods.getDiscount2();
+                }
+
+                CartBean cartBean = new CartBean(goods.getGoods(), goods.getName(), goods.getPrice(), weight, goods.getPicurl(),
+                        discount, goods.getCategory().getId(), goods.getBargoods(), goods.getMethod(), goods.getUnit());
+
+                EventBus.getDefault().post(cartBean);
             }
         });
 
         mGoodsAdapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
-                showSubCategoryMenuDialog(position);
+                if (mCategoryAdapter.getData().size() == 0) {
+                    ToastUtils.showToast("请先创建分类");
+                } else {
+                    showSubCategoryMenuDialog(position);
+                }
                 return true;
             }
         });
@@ -318,6 +339,23 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         intent.putExtra("return-data", true);
         startActivityForResult(intent, CROP_REQUEST_CODE);
     }
+
+
+
+    @OnClick({R.id.btn_edit_order, R.id.btn_add, R.id.btn_scan_down, R.id.btn_scan_up})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_edit_order:
+                break;
+            case R.id.btn_add:
+                break;
+            case R.id.btn_scan_down:
+                break;
+            case R.id.btn_scan_up:
+                break;
+        }
+    }
+
 
     /**
      * 显示添加主分类的对话框
@@ -797,8 +835,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     //--------OnRefreshListener-------------
     @Override
     public void onRefresh() {
-        KLog.i("onRefresh");
-
         mGoodsAdapter.setEnableLoadMore(false);//禁用加载更多
 
         loadGoodsData(mCategoryAdapter.getData().get(SELECT_POSITION).getId(), 1);//onRefresh() 回调。下拉刷新，要加载第一页数据
@@ -1076,10 +1112,12 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
      */
     private void modifySubCategory(String id, String categoryId, String name, String price, String discount2, String discount3, String notes, String method, String unit) {
 
-        UserApi.updateGood(TAG, shopId, categoryId, id, name, price, imgId, discount2, discount3, notes, method, unit,
+        UserApi.updateGood(TAG, token, shopId, categoryId, id, name, price, imgId, discount2, discount3, notes, method, unit,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        //KLog.json(response);
+
                         BaseBean bean = GsonUtil.getGson().fromJson(response, BaseBean.class);
 
                         if (bean.getStatus() == 1) {
@@ -1108,7 +1146,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     private void deleteSubCategory(String subCategoryId, final int position) {
         String categoryId = mGoodsAdapter.getData().get(position).getCategory().getId();
 
-        UserApi.deleteGood(TAG, shopId, categoryId, subCategoryId,
+        UserApi.deleteGood(TAG, token, shopId, categoryId, subCategoryId,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -1143,6 +1181,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String responseStr) {
+                        //KLog.json(responseStr);
                         try {
                             JSONObject response = new JSONObject(responseStr);
                             int status = response.getInt("status");
@@ -1168,7 +1207,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     }
 
 
-    //==========内部类============
+    //=================================内部类======================================
 
     /**
      * 分类的适配器

@@ -107,6 +107,9 @@ public class SplashActivity extends BaseActivty {
                             SPUtils.putString(AppConst.USER_ID, response.getData().getMobile());
                             SPUtils.putList(AppConst.LOGIN_SHOP_LIST, response.getData().getShopinfo());
                             SPUtils.putString(AppConst.CUR_SHOP_ID, response.getData().getShopinfo().get(0).getShopid()); // 默认当前店铺为第一个店铺
+                            SPUtils.putString(AppConst.CUR_SHOP_NAME, response.getData().getShopinfo().get(0).getShopname());
+                            SPUtils.putBoolean(AppConst.SUPPORT_ALIPAY, response.getData().getShopinfo().get(0).getAlipay_check() == 1); //等于1说明开通
+                            SPUtils.putBoolean(AppConst.SUPPORT_WECHATPAY, response.getData().getShopinfo().get(0).getWechatpay_check() == 1);
                         }
 
                         // 若网络请求的时间超过了3s，则此时就直接跳转；否则继续等待，直到3s钟后跳转

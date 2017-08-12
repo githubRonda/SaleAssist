@@ -19,8 +19,8 @@ mobile + password + confirmPassword + nickname + code
     * 初始化货物View --> 数据为空时，不会自动回调 onLoadMoreRequested()。 等分类数据加载成功之后，再加载货物数据
 
 * 分类列表
-    * 数据项可以点击（切换类别）， 可以长按（修改，删除）[todo]
-    * footerView （仅能点击）添加分类 [todo]
+    * 数据项可以点击（切换类别）， 可以长按（修改，删除）
+    * footerView （仅能点击）添加分类
 
 * 货物列表
     * 当分类列表数据加载完成之后，才加载货物数据
@@ -29,13 +29,27 @@ mobile + password + confirmPassword + nickname + code
     * 注意：pageCount 表示当前页码，加载更多成功之后，才自加1
     * 当“下拉刷新”的过程中，禁用“上拉加载更多”； 反之亦然。
     * 数据项可以点击（选择货物）， 可以长按（修改，删除）[todo]
-    * footerView （仅能点击）添加货物 [todo]
+    * footerView （仅能点击）添加货物
+    * 点击货物省略掉了确认对话框
+
+
+* 货篮
+    * 点击货物，添加至货篮（onEventMainThread）
+    * 删除指定货物（确认对话框）
+    * 清空
+    * 暂存
+    * 保存订单
 
 
 
 
 
 
+待解决
+修改货物两个折扣，不能使用LSpinner, 要改为 EditText属性的View
+登录成功保存结算的进制方式
+登录成功时，保存是否支持wechatpay 和 alipay
+当是总额逢1进或逢5进的时候，CartBean#getDiscountCost() 到底要不要只保留两位小数，多的直接舍去
 
 No adapter attached; skipping layout
 
@@ -46,6 +60,8 @@ GoodsAdapter中的最后一个添加项margin失效
 现在突然感觉不需要上拉加载更多，下拉刷新这么复杂的逻辑。直接一次性把数据给加载完毕即可（反正数据也不算多）
 
 有时间把 DropEditText 给优化一下
+
+
 
 选择图片还可以在优化（参考毕设）
 
