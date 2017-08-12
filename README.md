@@ -35,6 +35,7 @@ mobile + password + confirmPassword + nickname + code
     * 排序功能
     * 货物显示样式(品名 / 价格) [todo]
     * 货物显示需要一个PLU编号,需要后台增加一个属性 [非必须]
+    * 暂时把折扣和计件的标识给隐藏了
 
 
 * 货篮
@@ -46,15 +47,19 @@ mobile + password + confirmPassword + nickname + code
     * 结账（现金，支付宝，微信，挂账，会员支付）
 
 
-
+* 硬件相关功能
+    * USB扫码 --> 绑定到MainActivity，一直执行，当监听到条码时，自动获取对应货物，添加至货篮
 
 
 
 待解决
 修改货物两个折扣，不能使用LSpinner, 要改为 EditText属性的View
-登录成功保存结算的进制方式
-登录成功时，保存是否支持wechatpay 和 alipay
 当是总额逢1进或逢5进的时候，CartBean#getDiscountCost() 到底要不要只保留两位小数，多的直接舍去
+
+待优化
+USB扫码 可以当成一个服务（这样只能是无障碍服务） 一直启动， 当检测到条码值时，就自动获取对应货物，添加至货篮
+
+
 
 No adapter attached; skipping layout
 

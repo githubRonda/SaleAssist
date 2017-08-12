@@ -536,4 +536,28 @@ public class UserApi {
      */
 
 
+    /**
+     * 条码货物扫码信息获取接口：
+     */
+    public static void bargoodsInfoAndCreate(String tag, final String token, final String shopid, final String barcode, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_bargoods_infoandcreate", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("barcode", barcode);
+                return params;
+            }
+
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
 }
