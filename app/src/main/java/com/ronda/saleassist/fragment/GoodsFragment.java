@@ -1608,26 +1608,26 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 //                    .load(UserApi.BASE_SERVER + item.getPicurl())
 //                    .into((ImageView) holder.getView(R.id.img_subcategory));
 
-            if ("1".equals(item.getMethod())) {
-                holder.setVisible(R.id.img_num, true);
-                PaintUtil.paintCircle((ImageView) holder.getView(R.id.img_num));
-            } else {
-                holder.setVisible(R.id.img_num, false);
-            }
-
-            String discount = item.getDiscount2().trim();//discount2为公共折扣（要显示在主界面上的）
-            //判断是否是有效的折扣（不为0，不为1，不为空字符串）
-            if (discount.equals("0") || discount.equals("1") || discount.isEmpty()) {
-                holder.setVisible(R.id.img_discount, false);
-            } else {
-                holder.setVisible(R.id.img_discount, true); //必须要首先设置显示，要不然item复用是有的会显示不出来
-
-                if (Double.parseDouble(discount) > 0 && Double.parseDouble(discount) < 1) {
-                    String s = String.valueOf(Double.parseDouble(discount)); //先把discount转成double类型再转成String类型，是为了去除小数部分最后一位是0的情况
-
-                    PaintUtil.paintText(s.substring(s.indexOf(".") + 1, s.length()) + "折", (ImageView) holder.getView(R.id.img_discount));
-                }
-            }
+//            if ("1".equals(item.getMethod())) {
+//                holder.setVisible(R.id.img_num, true);
+//                PaintUtil.paintCircle((ImageView) holder.getView(R.id.img_num));
+//            } else {
+//                holder.setVisible(R.id.img_num, false);
+//            }
+//
+//            String discount = item.getDiscount2().trim();//discount2为公共折扣（要显示在主界面上的）
+//            //判断是否是有效的折扣（不为0，不为1，不为空字符串）
+//            if (discount.equals("0") || discount.equals("1") || discount.isEmpty()) {
+//                holder.setVisible(R.id.img_discount, false);
+//            } else {
+//                holder.setVisible(R.id.img_discount, true); //必须要首先设置显示，要不然item复用是有的会显示不出来
+//
+//                if (Double.parseDouble(discount) > 0 && Double.parseDouble(discount) < 1) {
+//                    String s = String.valueOf(Double.parseDouble(discount)); //先把discount转成double类型再转成String类型，是为了去除小数部分最后一位是0的情况
+//
+//                    PaintUtil.paintText(s.substring(s.indexOf(".") + 1, s.length()) + "折", (ImageView) holder.getView(R.id.img_discount));
+//                }
+//            }
 
             if (item.isMoving()) {
                 holder.setBackgroundRes(R.id.ll_content, R.drawable.bg_item_dash);

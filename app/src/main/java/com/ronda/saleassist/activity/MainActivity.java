@@ -184,13 +184,10 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
                 if (barcode.length() == 8 || barcode.length() == 13){
                     //TODO 处理条码 （获取对应货物信息，添加至货篮）
 
-                    if (!AppManager.getInstance().currentActivity().getPackageName().equals(MainActivity.class.getName())){
+                    if (AppManager.getInstance().currentActivity() != MainActivity.this){
                         return;
                     }
-                    KLog.e("isMainActivity --> "+ (AppManager.getInstance().currentActivity() == MainActivity.this));
-
                     getGoodsInfoByCode(barcode);
-
                 }
                 ToastUtils.showToast("barcode: " + barcode);
             }
