@@ -157,8 +157,8 @@ public class USBPrinter {
      *
      * @param msg
      */
-    public void print(String msg) {
-        final String printData = msg;
+    public void print(byte[] msg) {
+        final byte[] printData = msg;
         if (mUsbDevice != null) {
 
             UsbInterface usbInterface = mUsbDevice.getInterface(0);
@@ -174,16 +174,7 @@ public class USBPrinter {
                                 @Override
                                 public void run() {
                                     try {
-                                        //KLog.i("mUsbDevice: VI: "+mUsbDevice.getVendorId()+ ", printData: " + printData);
-                                        //byte[] bytes = printData.getBytes("GBK");
-
-                                        byte[] bytes = PrintUtils.generateBillData("123456", "0.5");
-
-
-                                        KLog.i("UsbInterfaceCount: " + mUsbDevice.getInterfaceCount());
-//                                        byte[] bytes = "你好！！".getBytes();
-
-                                        int b = mUsbDeviceConnection.bulkTransfer(ep, bytes, bytes.length, 100000);
+                                        int b = mUsbDeviceConnection.bulkTransfer(ep, printData, printData.length, 100000);
                                         Log.i("Return Status", "b-->" + b);
                                     } catch (Exception e) {
                                         e.printStackTrace();

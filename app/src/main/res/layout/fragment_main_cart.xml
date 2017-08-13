@@ -179,10 +179,23 @@
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:layout_weight="1"
-                    android:text="现金"
+                    android:text="现金结账"
+                    android:textSize="16sp"
                     />
 
                 <Button
+                    android:id="@+id/btn_add"
+                    style="@style/bigRedButton"
+                    android:layout_width="0dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="添加金额"
+                    android:textSize="16sp"
+                    />
+
+                <Button
+                    android:visibility="gone"
                     android:id="@+id/btn_pay_ali"
                     style="@style/bigRedButton"
                     android:layout_width="wrap_content"
@@ -194,6 +207,7 @@
                     />
 
                 <Button
+                    android:visibility="gone"
                     android:id="@+id/btn_pay_weixin"
                     style="@style/bigRedButton"
                     android:layout_width="0dp"
@@ -221,6 +235,7 @@
                     />
 
                 <Button
+                    android:visibility="gone"
                     android:id="@+id/btn_pay_delay"
                     style="@style/bigRedButton"
                     android:layout_width="0dp"
@@ -231,6 +246,7 @@
                     />
 
                 <Button
+                    android:visibility="gone"
                     android:id="@+id/btn_vip_pay"
                     style="@style/bigRedButton"
                     android:layout_width="0dp"

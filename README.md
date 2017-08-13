@@ -93,3 +93,147 @@ http://blog.csdn.net/u014165119/article/details/46834265
 
 Frame中BaseActivity中DialogFactory
 
+
+
+
+    private void checkUpdate() {
+         /*
+            1. 点击检查更新按钮
+            2. 显示获取新版本的加载进度对话框，并且向后台发送请求来获取版本信息（若网络较好的话，这个加载进度对话框就看不出来，其实这个对话框也可以不要，只不过是为了网络慢是的友好性交互）
+            3. 当请求结束时，关闭对话框。
+                 若请求成功，比较版本是否相同？若不同，则弹出对话框，提示有新版本；若相同，则Toast信息
+                 若请求失败，Toast信息
+            4. 若选择下载新版本，则访问后台进行下载，并显示下载进度对话框
+            5. 下载完毕后，关闭对话框，
+                 若下载成功，则跳转到安装界面
+                 若下载失败，则Toast信息
+             */
+        checkDialog = new ProgressDialog(this);
+        checkDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        checkDialog.setMessage("正在获取新版本");
+        checkDialog.setCancelable(false);
+        checkDialog.show();
+
+        new AsyncTask<String, Void, String>() { //获取后台数据，需要异步操作（开启一个新的线程）
+            @Override
+            protected String doInBackground(String... params) {
+
+                BufferedReader br = null;
+                StringBuilder sb = new StringBuilder();
+                try {
+                    URL url = new URL(params[0]);
+                    URLConnection connection = url.openConnection(); //获取连接
+                    InputStream is = connection.getInputStream(); //获取字节输入流
+                    InputStreamReader isr = new InputStreamReader(is, "utf-8"); //把字节输入流转成字符输入流
+                    br = new BufferedReader(isr);
+
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (br != null) br.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                return sb.toString();
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                checkDialog.cancel();
+                parseXMLStr(s);
+            }
+        }.execute("http://soft.edianlai.com/cxmm/update/update.xml");
+    }
+
+
+    // 获取当前版本的版本号
+    private String getVersion() {
+        try {
+            PackageManager packageManager = getPackageManager();
+            PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return "版本号未知";
+        }
+    }
+
+    private void parseXMLStr(String responseStr) {
+        try {
+            XmlPullParser parser = Xml.newPullParser();
+            //parser.setInput(new StringReader(xmlStr));
+            parser.setInput(new ByteArrayInputStream(responseStr.getBytes()), "UTF-8");
+            int event = parser.getEventType();
+            while (event != XmlPullParser.END_DOCUMENT) {
+                switch (event) {
+                    case XmlPullParser.START_TAG:// 开始元素事件
+                        String name = parser.getName();
+
+                        if (name.equalsIgnoreCase("version")) {
+                            version = parser.nextText(); // 如果后面是Text节点,即返回它的值
+                        } else if (name.equalsIgnoreCase("description")) {
+                            description = parser.nextText();
+                        } else if (name.equalsIgnoreCase("url")) {
+                            url = parser.nextText();
+                        }
+                        break;
+                }
+                event = parser.next();
+            }
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //KLog.i("version:"+version+", description:"+description+", url:"+url);
+
+        if (!version.equals(getVersion())) { //不相等，即有新版本
+            showUpdateDialog();
+        } else {
+            Toast.makeText(this, "当前已是最新版本", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showUpdateDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //builder.setIcon(R.drawable.ic_launcher);
+        builder.setTitle("提示");
+        builder.setMessage("发现新版本，是否更新？");
+        builder.setCancelable(false);
+
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {//若sd卡可用
+                    //downloadFile();
+                } else {
+                    Toast.makeText(SettingActivity.this, "SD卡不可用，请插入SD卡", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        builder.setNegativeButton("取消", null);
+        builder.create().show();
+    }
+
+
+
+    //安装文件，一般固定写法
+    private void install() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "chengxin.apk")),
+                "application/vnd.android.package-archive");
+        startActivity(intent);
+    }
+

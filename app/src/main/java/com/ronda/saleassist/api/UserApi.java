@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
@@ -491,8 +492,66 @@ public class UserApi {
 
     /**
      * 13. 订单上传
-     private static final String UPLOAD_ORDER = "/market/api/order_info_upload";
      */
+    /**
+     * 订单上传
+     * <p>
+     * //@param token  令牌
+     *
+     * @param shopid  商店id
+     * @param data    订单数据（json数组格式字符串）
+     *                number  该货物数量（重量）
+     *                goodId  货物id
+     */
+    public static void uploadOrder(String tag, String token, String shopid, String data, String total, String paycode, String method, String customer,
+                                   Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        uploadOrder(tag, token, shopid, data, total, paycode, method, customer, "", "", "", "", listener, errorListener);
+    }
+
+    public static void uploadOrder(final String tag, final String token, final String shopid, final String data, final String total, final String paycode,
+                                   final String method, final String customer,
+                                   final String costprice, final String extmethod, final String extcode, final String extpay,
+                                   Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        VolleyUtil.getInstance().cancelPendingRequests(tag);//防止出现多次重复请求
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/order_info_upload", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);//100001
+                params.put("total", total);
+                params.put("paycode", paycode);
+                params.put("method", method);
+                params.put("customer", customer);//买家id
+                params.put("data", data); //json数组格式的字符串
+
+                params.put("costprice", costprice); //会员优惠后的总额
+                params.put("extmethod", extmethod);
+                params.put("extcode", extcode);
+                params.put("extpay", extpay);
+
+                /*
+                costprice	:	优惠后的总价
+                extmethod:	额外支付方式（目前参数：’alipay’,’cash’） 会员账户余额不足时
+                extcode	:	会员支付验证码（扫码时获得）
+                extpay	:	额外支付金额  会员账户余额不足时
+
+                */
+
+                KLog.w(tag + "--> " + new Gson().toJson(params));
+                return params;
+            }
+        };
+        // 防止框架内部多次请求
+        strReq.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
 
     /**
      * 14. 订单列表

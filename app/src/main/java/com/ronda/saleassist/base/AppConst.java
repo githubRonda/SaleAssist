@@ -76,4 +76,13 @@ public interface AppConst {
      */
 
     String GOODS_STYLE = "goods_style";
+
+    /**
+     * 重量串口
+     */
+    String WEIGHT_SERIAL_PORT = "weight_serial_port";
+    /**
+     * 交互指令串口
+     */
+    String CMD_SERIAL_PORT = "cmd_serial_port";
 }

@@ -7,8 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -51,7 +49,6 @@ import com.ronda.saleassist.api.volley.GsonUtil;
 import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.BaseFragment;
-import com.ronda.saleassist.base.MyApplication;
 import com.ronda.saleassist.base.SPHelper;
 import com.ronda.saleassist.bean.BaseBean;
 import com.ronda.saleassist.bean.CartBean;
@@ -64,12 +61,10 @@ import com.ronda.saleassist.bean.SubCategory;
 import com.ronda.saleassist.dialog.GoodsStyleDialog;
 import com.ronda.saleassist.engine.BarcodeScannerResolver;
 import com.ronda.saleassist.local.preference.SPUtils;
-import com.ronda.saleassist.local.sqlite.table.Goods;
+import com.ronda.saleassist.serialport.CmdSerialPort;
+import com.ronda.saleassist.serialport.WeightSerialPort;
 import com.ronda.saleassist.utils.Base64Encoder;
-import com.ronda.saleassist.utils.MathCompute;
-import com.ronda.saleassist.utils.PaintUtil;
 import com.ronda.saleassist.utils.ToastUtils;
-import com.ronda.saleassist.view.DigitKeyboardView;
 import com.ronda.saleassist.view.LSpinner;
 import com.ronda.saleassist.view.RadioGroupEx;
 import com.socks.library.KLog;
@@ -82,7 +77,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -112,12 +106,8 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     RecyclerView mRecyclerView;
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
-    @BindView(R.id.btn_add)
-    Button mBtnAdd;
     @BindView(R.id.btn_scan_down)
     Button mBtnScanDown;
-    @BindView(R.id.btn_scan_up)
-    Button mBtnScanUp;
     @BindView(R.id.fragment_category)
     LinearLayout mFragmentCategory;
 
@@ -164,6 +154,10 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     private static String memberCode;
 
     private BarcodeScannerResolver mBarcodeScannerResolver; //扫码监听
+    private WeightSerialPort mWeightSerialPort;
+    private String weightComm;
+    private String cmdComm;
+    private CmdSerialPort mCmdSerialPort;
 
     @Override
     public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -180,12 +174,34 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         initGoodsEvent();
 
         initDragGoodsEvent();
+
+        initReadWeightSerial();
+
+        initCmdSerial();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        //串口改变了
+        if (!SPUtils.getString(AppConst.WEIGHT_SERIAL_PORT, "").equals(weightComm)) {
+            initReadWeightSerial();
+        }
+
+        if (!SPUtils.getString(AppConst.CMD_SERIAL_PORT, "").equals(cmdComm)) {
+            initCmdSerial();
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         VolleyUtil.getInstance().cancelPendingRequests(TAG);
+
+        if (mWeightSerialPort != null) {
+            mWeightSerialPort.closeSerial();
+        }
     }
 
     private void initCategoryView() {
@@ -317,6 +333,48 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         });
     }
 
+    private void initReadWeightSerial() {
+        weightComm = SPUtils.getString(AppConst.WEIGHT_SERIAL_PORT, "");
+
+
+        if (TextUtils.isEmpty(weightComm)) {
+            Toast.makeText(getActivity(), "未设置重量的串口", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!weightComm.toLowerCase().startsWith("/dev/ttys")) {
+            Toast.makeText(getActivity(), "重量串口设置有误！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mWeightSerialPort = new WeightSerialPort(weightComm);
+
+        if (!mWeightSerialPort.isActive()) {
+            Toast.makeText(getActivity(), "重量串口不能使用", Toast.LENGTH_SHORT).show();
+            return;
+        }
+    }
+
+    private void initCmdSerial() {
+        cmdComm = SPUtils.getString(AppConst.CMD_SERIAL_PORT, "");
+
+
+        if (TextUtils.isEmpty(cmdComm)) {
+            Toast.makeText(getActivity(), "未设置指令的串口", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!cmdComm.toLowerCase().startsWith("/dev/ttys")) {
+            Toast.makeText(getActivity(), "指令串口设置有误！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mCmdSerialPort = new CmdSerialPort(cmdComm);
+
+        if (!mCmdSerialPort.isActive()) {
+            Toast.makeText(getActivity(), "指令串口不能使用", Toast.LENGTH_SHORT).show();
+            return;
+        }
+    }
+
+
+
     /**
      * 拖拽事件
      */
@@ -399,7 +457,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     }
 
 
-    @OnClick({R.id.img_arrow_left, R.id.btn_edit_order, R.id.btn_add, R.id.btn_scan_down, R.id.btn_scan_up})
+    @OnClick({R.id.img_arrow_left, R.id.btn_edit_order, R.id.btn_goods_style, R.id.btn_scan_down})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.img_arrow_left:
@@ -408,13 +466,10 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
             case R.id.btn_edit_order:
                 doEditOrder();
                 break;
-            case R.id.btn_add:
-                showAddDialog();
-                break;
-            case R.id.btn_scan_down:
+            case R.id.btn_goods_style:
                 doGoodsSurface();
                 break;
-            case R.id.btn_scan_up:
+            case R.id.btn_scan_down:
                 break;
         }
     }
@@ -926,48 +981,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 
 
     /**
-     * 添加额外项
-     */
-    private void showAddDialog() {
-
-        final AlertDialog dialogAddition = new AlertDialog.Builder(getActivity()).create();
-        dialogAddition.show();
-        dialogAddition.getWindow().setContentView(R.layout.dialog_addition);
-
-        DigitKeyboardView keyboardView = (DigitKeyboardView) dialogAddition.findViewById(R.id.digit_keyboard_view);
-        Button btn_confirm = (Button) dialogAddition.getWindow().findViewById(R.id.btn_confirm);
-        Button btn_cancel = (Button) dialogAddition.getWindow().findViewById(R.id.btn_cancel);
-        final EditText edit_addition = (EditText) dialogAddition.getWindow().findViewById(R.id.edit_addition);
-
-        keyboardView.bindEditTextViews(getActivity().getWindow(), edit_addition);
-
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialogAddition.dismiss();
-            }
-        });
-
-        btn_confirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String addtion = edit_addition.getText().toString().trim();
-
-                if (addtion.isEmpty()) {
-                    Toast.makeText(getActivity(), "金额不能为空！", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                dialogAddition.dismiss();
-
-                CartBean cartBean = new CartBean("1000", "额外项", addtion, "1", "", "1", "", "", "0", "");
-                cartBean.setDate(System.currentTimeMillis());
-                EventBus.getDefault().post(cartBean);
-            }
-        });
-    }
-
-
-    /**
      * 商品排列样式
      */
     private void doGoodsSurface() {
@@ -1393,10 +1406,9 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     }
 
 
-
     /**
      * 不间断的检测 mBluetooth 中的静态变量 payQrcode goodsCode memberCode 是否为空，不为空的话，取出其内容，且重置为空
-     *
+     * <p>
      * //@param codeType 标识当前检测的条码时是支付码，还是货物码，或者会员码（当codeType是会员码时，用于标识该会员码用于支付还是挂账）
      */
 //    public void startTimer(final int codeType) {
@@ -1481,7 +1493,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 //
 //        timer.schedule(task, 0, 800);//启动定时器，延迟为1s，循环间隔为1s
 //    }
-
     public void stopTimer() {
         if (timer != null) {
             task.cancel();
@@ -1501,10 +1512,10 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
             public void onScanSuccess(String barcode) {
                 //TODO 显示扫描内容
                 //条码有8位和13位的
-                if (barcode.length() == 8 || barcode.length() == 13){
+                if (barcode.length() == 8 || barcode.length() == 13) {
                     Log.w(TAG, "barcode: " + barcode);
                 }
-               ToastUtils.showToast("barcode: " + barcode);
+                ToastUtils.showToast("barcode: " + barcode);
             }
         });
     }
@@ -1572,7 +1583,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
                 holder.itemView.setLayoutParams(params);
 
 
-
                 // 设置正文字体
                 ((TextView) holder.getView(R.id.tv_plu)).setTextSize(mStyle.getTextSize());
                 ((TextView) holder.getView(R.id.tv_price)).setTextSize(mStyle.getTextSize());
@@ -1600,7 +1610,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
             //holder.setText(R.id.tv_plu, item.getNumber());
             holder.setText(R.id.tv_name, item.getName());
             holder.setText(R.id.tv_price, item.getPrice() + item.getUnit());
-
 
 
 //            holder.setText(R.id.text_subcategory, item.getName() + " " + item.getPrice() + item.getUnit());

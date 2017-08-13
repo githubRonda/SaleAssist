@@ -10,15 +10,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-
 import com.ronda.saleassist.R;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.BaseDialogFragment;
-import com.ronda.saleassist.base.BaseFragment;
-import com.ronda.saleassist.base.SPHelper;
 import com.ronda.saleassist.bean.GoodsStyle;
 import com.ronda.saleassist.local.preference.SPUtils;
-import com.ronda.saleassist.local.sqlite.table.Goods;
 import com.socks.library.KLog;
 
 import java.util.Arrays;

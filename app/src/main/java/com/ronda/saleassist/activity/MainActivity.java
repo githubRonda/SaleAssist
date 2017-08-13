@@ -24,6 +24,7 @@ import com.ronda.saleassist.base.MyApplication;
 import com.ronda.saleassist.bean.CartBean;
 import com.ronda.saleassist.engine.BarcodeScannerResolver;
 import com.ronda.saleassist.local.preference.SPUtils;
+import com.ronda.saleassist.printer.USBPrinter;
 import com.ronda.saleassist.utils.MusicUtil;
 import com.ronda.saleassist.utils.ToastUtils;
 import com.socks.library.KLog;
@@ -60,6 +61,8 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
         initEvent();
 
         startScanListen();
+
+        USBPrinter.getInstance().initPrinter(this);
     }
 
     @Override
@@ -74,6 +77,8 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
         mDrawerLayout.removeDrawerListener(mDrawerToggle);
 
         removeScanListen();
+
+        USBPrinter.getInstance().destroyPrinter();
     }
 
     private void initEvent() {
@@ -142,9 +147,9 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
 //            case R.id.ll_member_manage:
 //                jump(ManageVipActivity.class);
 //                break;
-//            case R.id.ll_setting:
-//                jump(SettingActivity.class);
-//                break;
+            case R.id.ll_setting:
+                jump(SettingActivity.class);
+                break;
 //            case R.id.ll_shop_apply:
 //                jump(ShopApplyActivity.class);
 //                break;

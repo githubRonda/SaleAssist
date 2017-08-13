@@ -1,7 +1,6 @@
 package com.ronda.saleassist.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -18,10 +17,8 @@ import com.ronda.saleassist.api.UserApi;
 import com.ronda.saleassist.api.volley.GsonUtil;
 import com.ronda.saleassist.base.BaseActivty;
 import com.ronda.saleassist.bean.BaseBean;
-import com.ronda.saleassist.local.sqlite.table.User;
 import com.ronda.saleassist.utils.MD5Utils;
 import com.ronda.saleassist.utils.ToastUtils;
-import com.socks.library.KLog;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
