@@ -49,7 +49,6 @@ import com.ronda.saleassist.api.volley.GsonUtil;
 import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.BaseFragment;
-import com.ronda.saleassist.base.SPHelper;
 import com.ronda.saleassist.bean.BaseBean;
 import com.ronda.saleassist.bean.CartBean;
 import com.ronda.saleassist.bean.Category;
@@ -58,6 +57,7 @@ import com.ronda.saleassist.bean.GoodsBean;
 import com.ronda.saleassist.bean.GoodsOrder;
 import com.ronda.saleassist.bean.GoodsStyle;
 import com.ronda.saleassist.bean.SubCategory;
+import com.ronda.saleassist.bean.WeightEvent;
 import com.ronda.saleassist.dialog.GoodsStyleDialog;
 import com.ronda.saleassist.engine.BarcodeScannerResolver;
 import com.ronda.saleassist.local.preference.SPUtils;
@@ -70,11 +70,12 @@ import com.ronda.saleassist.view.RadioGroupEx;
 import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -95,33 +96,33 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 
 
     @BindView(R.id.btn_edit_order)
-    Button mBtnEditOrder;
+    Button             mBtnEditOrder;
     @BindView(R.id.btn_refresh)
-    Button mBtnRefresh;
+    Button             mBtnRefresh;
     @BindView(R.id.img_arrow_left)
-    ImageButton mImgArrowLeft;
+    ImageButton        mImgArrowLeft;
     @BindView(R.id.rv_category)
-    RecyclerView mRvCategory;
+    RecyclerView       mRvCategory;
     @BindView(R.id.recycler_view)
-    RecyclerView mRecyclerView;
+    RecyclerView       mRecyclerView;
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.btn_scan_down)
-    Button mBtnScanDown;
+    Button             mBtnScanDown;
     @BindView(R.id.fragment_category)
-    LinearLayout mFragmentCategory;
+    LinearLayout       mFragmentCategory;
 
-    private static final int CODE_GOODS = 0x10;
+    private static final int CODE_GOODS            = 0x10;
     private static final int CODE_MEMBER_DELAY_PAY = 0x20; //表示会员码，用于挂账
-    private static final int CODE_MEMBER_PAY = 0x21; // 表示会员码，用于会员支付
-    private static final int CODE_ALI_PAY = 0x30;
-    private static final int CODE_WECHAT_PAY = 0x40;
+    private static final int CODE_MEMBER_PAY       = 0x21; // 表示会员码，用于会员支付
+    private static final int CODE_ALI_PAY          = 0x30;
+    private static final int CODE_WECHAT_PAY       = 0x40;
 
 
-    private static final int SELECT_PICTURE = 0; // 相册选择图片请求
+    private static final int SELECT_PICTURE    = 0; // 相册选择图片请求
     private static final int CROP_REQUEST_CODE = 1; //裁剪图片请求
 
-    private String token = SPUtils.getString(AppConst.TOKEN, "");
+    private String token  = SPUtils.getString(AppConst.TOKEN, "");
     private String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
 
     private static final int ONE_SCREEN_SIZE = 36; // 表示一屏的数据。要比pageSize要小
@@ -129,10 +130,10 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     public static int SELECT_POSITION = 0; //选中的分类项
 
     private int pageCount = 0; //分页加载的页码，当前页。（加载下一页成功后，会加1）。后台是从1开始。因为前台一开始是没有数据，所以初始化为0，当第一页数据加载成功之后，才为1
-    private int pageSize = 40; //每页的大小
+    private int pageSize  = 40; //每页的大小
 
     private CategoryAdapter mCategoryAdapter;
-    private GoodsAdapter mGoodsAdapter;
+    private GoodsAdapter    mGoodsAdapter;
 
     private ImageView img_pic; //修改货物对话框中的View，提取出来的原因就是因为在裁剪图片的回调方法中要设置
 
@@ -143,7 +144,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     private ItemTouchHelper mItemTouchHelper;
 
 
-    private Timer timer;
+    private Timer     timer;
     private TimerTask task;
 
     // handler 处理支付码和货物码
@@ -154,13 +155,17 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     private static String memberCode;
 
     private BarcodeScannerResolver mBarcodeScannerResolver; //扫码监听
-    private WeightSerialPort mWeightSerialPort;
-    private String weightComm;
-    private String cmdComm;
-    private CmdSerialPort mCmdSerialPort;
+    private WeightSerialPort       mWeightSerialPort;
+    private String                 weightComm;
+    private String                 cmdComm;
+    private CmdSerialPort          mCmdSerialPort;
+    private WeightEvent            mWeightEvent;// 串口发送过来的重量,
 
     @Override
     public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        EventBus.getDefault().register(this);//注册事件总线
+
         return inflater.inflate(R.layout.fragment_main_goods, container, false);
     }
 
@@ -202,6 +207,16 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         if (mWeightSerialPort != null) {
             mWeightSerialPort.closeSerial();
         }
+
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEventMainThread(WeightEvent weightEvent) {
+        this.mWeightEvent = weightEvent;
+
+//        KLog.i("GoodsFragment: weightEvent --> "+ weightEvent.getWeight());
+
     }
 
     private void initCategoryView() {
@@ -300,12 +315,15 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
                 // TODO: 2017/8/12/0012 这里省略掉确认对话框
                 SubCategory goods = mGoodsAdapter.getData().get(position);
 
-                String weight;
+                String weight="0.000";
                 if ("1".equals(goods.getMethod())) { //计件类 ： 不需要获取秤端重量
                     weight = "1";
                 } else { //称重类， 需要货物秤端的重量
-                    //weight = CommonUtil.getWeight(mBluetooth.weightStr) / 1000.0;//单位是kg
-                    weight = new DecimalFormat("0.00").format(Math.random() * 10); // 模拟一个随机值
+                    //mWeightEvent = CommonUtil.getWeight(mBluetooth.weightStr) / 1000.0;//单位是kg
+//                    mWeightEvent = new DecimalFormat("0.00").format(Math.random() * 10); // 模拟一个随机值
+                    if (mWeightEvent != null) {
+                        weight = mWeightEvent.getWeight();
+                    }
                 }
 
                 String discount = "1";
@@ -372,7 +390,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
             return;
         }
     }
-
 
 
     /**

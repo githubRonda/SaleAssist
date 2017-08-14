@@ -6,10 +6,10 @@ package com.ronda.saleassist.bean;
  * Version: v1.0
  */
 
-public class Weight {
-    private String weight;
+public class WeightEvent {
+    private String weight = "0.000";
 
-    public Weight(String weight) {
+    public WeightEvent(String weight) {
         this.weight = weight;
     }
 

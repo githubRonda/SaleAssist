@@ -91,7 +91,7 @@ static speed_t getBaudrate(jint baudrate) {
 
 
 JNIEXPORT jobject JNICALL
-Java_com_ronda_serialportassist_serialport_SerialPort_open(JNIEnv *env, jclass thiz, jstring path, jint baudrate,
+Java_com_ronda_saleassist_serialport_SerialPort_open(JNIEnv *env, jclass thiz, jstring path, jint baudrate,
                                               jint flags) {
     int fd;
     speed_t speed;
@@ -164,7 +164,7 @@ Java_com_ronda_serialportassist_serialport_SerialPort_open(JNIEnv *env, jclass t
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_com_ronda_serialportassist_serialport_SerialPort_close(JNIEnv *env, jobject thiz) {
+Java_com_ronda_saleassist_serialport_SerialPort_close(JNIEnv *env, jobject thiz) {
     jclass SerialPortClass = (*env)->GetObjectClass(env, thiz);
     jclass FileDescriptorClass = (*env)->FindClass(env, "java/io/FileDescriptor");
 

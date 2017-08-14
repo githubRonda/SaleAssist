@@ -2,7 +2,8 @@ package com.ronda.saleassist.serialport;
 
 import android.util.Log;
 
-import com.ronda.saleassist.bean.Weight;
+import com.ronda.saleassist.bean.WeightEvent;
+import com.ronda.saleassist.utils.CommonUtil;
 import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 
 /**
  * Author: Ronda(1575558177@qq.com)
@@ -22,8 +24,8 @@ import java.text.DecimalFormat;
 public class CmdSerialPort {
 
 
-    private SerialPort mSerialPort;
-    private InputStream mInputStream;
+    private SerialPort   mSerialPort;
+    private InputStream  mInputStream;
     private OutputStream mOutputStream;
 
     private ReadThread mReadThread;
@@ -98,8 +100,8 @@ public class CmdSerialPort {
 
     class ReadThread extends Thread {
 
-        private StringBuilder sb = new StringBuilder();
-        private byte[] buf = new byte[128];
+        private StringBuilder sb  = new StringBuilder();
+        private byte[]        buf = new byte[1024];
 
         DecimalFormat format = new DecimalFormat("#0.000");
 
@@ -112,25 +114,28 @@ public class CmdSerialPort {
 
                 try {
                     int len = mInputStream.read(buf);
-                    //Log.i("TAG", "length is:" + len + ",data is:" + new String(buf, 0, len));
+
                     if (len != -1) {
+                        byte[] buf_data = Arrays.copyOf(buf, len);
+                        String temp = CommonUtil.bytesToHexString(buf_data);
 
-                        sb.append(new String(buf, 0, len));
-                        Log.i("TAG", sb.toString());
-                        if ((startIndex = sb.indexOf(" ")) != -1 && (endIndex = sb.indexOf(" ", startIndex + 1)) != -1) {
-                            String weight = sb.substring(startIndex + 1, endIndex);
-                            double weight_d = Double.parseDouble(weight);
-                            String str = format.format(weight_d);
-
-                            KLog.d("str: " + str);
-                            EventBus.getDefault().post(new Weight(str));
-                            sb.setLength(0);
-                        }
-
-                        // TODO: 2017/8/8/0008  你可在这里在对sb做过长清空处理
-                        if (sb.length()>20){
-                            sb.setLength(0);
-                        }
+                        Log.d("zhiling", "指令数据: " + temp);
+//                        sb.append(new String(buf, 0, len));
+//                        Log.i("TAG", sb.toString());
+//                        if ((startIndex = sb.indexOf(" ")) != -1 && (endIndex = sb.indexOf(" ", startIndex + 1)) != -1) {
+//                            String weight = sb.substring(startIndex + 1, endIndex);
+//                            double weight_d = Double.parseDouble(weight);
+//                            String str = format.format(weight_d);
+//
+//                            KLog.d("str: " + str);
+//                            EventBus.getDefault().post(new WeightEvent(str));
+//                            sb.setLength(0);
+//                        }
+//
+//                        // TODO: 2017/8/8/0008  你可在这里在对sb做过长清空处理
+//                        if (sb.length()>20){
+//                            sb.setLength(0);
+//                        }
 
 
 //                        if ((startIndex = sb.indexOf("=")) != -1 && (endIndex = sb.indexOf("=", startIndex + 1)) != -1) {
@@ -147,7 +152,7 @@ public class CmdSerialPort {
 //                                String str = format.format(weight_d); // 保留3位小数。用于实时显示重量数据
 //
 //                                //KLog.w("str = " + str);
-//                                EventBus.getDefault().post(new Weight(str));
+//                                EventBus.getDefault().post(new WeightEvent(str));
 ////                            mHandler.obtainMessage(0, str).sendToTarget();
 //                                //EventBus.getDefault().post(new WeightEvent()); // 不用EventBus或广播的原因就是我担心频繁的创建对象会消耗大量的资源
 //                                sb.setLength(0);

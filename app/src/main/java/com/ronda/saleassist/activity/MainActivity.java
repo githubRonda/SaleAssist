@@ -1,5 +1,7 @@
 package com.ronda.saleassist.activity;
 
+import android.content.Context;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,10 +9,14 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -22,6 +28,7 @@ import com.ronda.saleassist.base.AppManager;
 import com.ronda.saleassist.base.BaseActivty;
 import com.ronda.saleassist.base.MyApplication;
 import com.ronda.saleassist.bean.CartBean;
+import com.ronda.saleassist.bean.WeightEvent;
 import com.ronda.saleassist.engine.BarcodeScannerResolver;
 import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.printer.USBPrinter;
@@ -30,6 +37,8 @@ import com.ronda.saleassist.utils.ToastUtils;
 import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,15 +50,18 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
     @BindView(R.id.nav_view)
     NavigationView mNavView;
     @BindView(R.id.drawer_layout)
-    DrawerLayout mDrawerLayout;
+    DrawerLayout   mDrawerLayout;
 
-    private String token = SPUtils.getString(AppConst.TOKEN, "");
+    private String token  = SPUtils.getString(AppConst.TOKEN, "");
     private String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
 
     private ActionBarDrawerToggle mDrawerToggle;
 
     private BarcodeScannerResolver mBarcodeScannerResolver; //扫码解析器
 
+    private WindowManager mWM;
+    private View          mToastView;
+    private TextView      mTvWeight;
 
 
     @Override
@@ -63,6 +75,10 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
         startScanListen();
 
         USBPrinter.getInstance().initPrinter(this);
+
+        mWM = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
+
+        EventBus.getDefault().register(this);//注册事件总线
     }
 
     @Override
@@ -79,6 +95,8 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
         removeScanListen();
 
         USBPrinter.getInstance().destroyPrinter();
+
+        EventBus.getDefault().unregister(this);
     }
 
     private void initEvent() {
@@ -176,7 +194,6 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
     }
 
 
-
     /**
      * 开始扫码监听
      */
@@ -186,10 +203,10 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
             @Override
             public void onScanSuccess(String barcode) {
                 //条码有8位和13位的
-                if (barcode.length() == 8 || barcode.length() == 13){
+                if (barcode.length() == 8 || barcode.length() == 13) {
                     //TODO 处理条码 （获取对应货物信息，添加至货篮）
 
-                    if (AppManager.getInstance().currentActivity() != MainActivity.this){
+                    if (AppManager.getInstance().currentActivity() != MainActivity.this) {
                         return;
                     }
                     getGoodsInfoByCode(barcode);
@@ -232,6 +249,56 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
         } else {
             finish();
         }
+    }
+
+    /**
+     * 自定义归属地浮窗显示
+     */
+    private void showToast(String text) {
+        if (mToastView == null) {
+            final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            params.width = WindowManager.LayoutParams.WRAP_CONTENT;
+            params.format = PixelFormat.TRANSLUCENT;
+            params.windowAnimations = android.R.style.Animation_Toast;
+            params.type = WindowManager.LayoutParams.TYPE_TOAST;
+//            params.type = WindowManager.LayoutParams.TYPE_PHONE;
+            params.flags = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                    | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+            params.gravity = Gravity.LEFT + Gravity.TOP;
+            params.setTitle("Toast");
+//            params.x = 10;
+//            params.y = 50;
+
+            mToastView = LayoutInflater.from(this).inflate(R.layout.toast_address, null);
+            mTvWeight = (TextView) mToastView.findViewById(R.id.tv_weight);
+
+            mWM.addView(mToastView, params);
+        }
+        mTvWeight.setText(text);
+    }
+
+    private void hideToast() {
+        if (mToastView != null) {
+            mWM.removeViewImmediate(mToastView);
+            mToastView = null;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(final WeightEvent weightEvent) {
+        String weight = weightEvent.getWeight();
+        try {
+            if (Double.parseDouble(weight) == 0) {
+                hideToast();
+            } else {
+                showToast(weight);
+            }
+        } catch (Exception e) {
+            hideToast();
+        }
+        //KLog.i("MainActivity: weightEvent --> " + weightEvent.getWeight());
     }
 
 

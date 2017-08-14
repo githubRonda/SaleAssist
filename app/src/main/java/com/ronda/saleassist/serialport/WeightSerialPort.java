@@ -2,8 +2,7 @@ package com.ronda.saleassist.serialport;
 
 import android.util.Log;
 
-import com.ronda.saleassist.bean.Weight;
-import com.ronda.saleassist.utils.ToastUtils;
+import com.ronda.saleassist.bean.WeightEvent;
 import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -29,12 +28,16 @@ public class WeightSerialPort {
 
     private ReadThread mReadThread;
 
+//    private Handler mHandler;
+
     private boolean isActive;
     // private boolean isStop = false;
 
 
-    public WeightSerialPort(String path) {
 
+    public WeightSerialPort(String path/*, Handler handler*/) {
+
+//        this.mHandler = handler;
 
         try {
             // mSerialPort = new SerialPort(new File("/dev/ttyS1"), 9600, 0);
@@ -51,6 +54,8 @@ public class WeightSerialPort {
             isActive = true;
         } catch (IOException e) {
             e.printStackTrace();
+
+            KLog.d(e);
 
             isActive = false;
         }
@@ -95,6 +100,10 @@ public class WeightSerialPort {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+//        if(mHandler!=null){
+//            mHandler.removeCallbacks(null);
+//        }
     }
 
     class ReadThread extends Thread {
@@ -113,12 +122,9 @@ public class WeightSerialPort {
 
                 try {
                     int len = mInputStream.read(buf);
-                    //Log.i("TAG", "length is:" + len + ",data is:" + new String(buf, 0, len));
+                    Log.i("weight", "length is:" + len + ",data is:" + new String(buf, 0, len));
                     if (len != -1) {
-
-                        ToastUtils.showToast(new String(buf, 0, len));
-
-//                        sb.append(new String(buf, 0, len));
+                        sb.append(new String(buf, 0, len));
 //                        Log.i("TAG", sb.toString());
 //                        if ((startIndex = sb.indexOf(" ")) != -1 && (endIndex = sb.indexOf(" ", startIndex + 1)) != -1) {
 //                            String weight = sb.substring(startIndex + 1, endIndex);
@@ -126,7 +132,7 @@ public class WeightSerialPort {
 //                            String str = format.format(weight_d);
 //
 //                            KLog.d("str: " + str);
-//                            EventBus.getDefault().post(new Weight(str));
+//                            EventBus.getDefault().post(new WeightEvent(str));
 //                            sb.setLength(0);
 //                        }
 //
@@ -136,28 +142,26 @@ public class WeightSerialPort {
 //                        }
 
 
-//                        if ((startIndex = sb.indexOf("=")) != -1 && (endIndex = sb.indexOf("=", startIndex + 1)) != -1) {
-//                            // 两个等号之间有13位
-//                            if ((endIndex - startIndex) < 9) { // 说明是错误数据
-//                                sb.setLength(0);
-//                            } else {
-//                                String data = sb.substring(startIndex + 1, endIndex); // 第一位是等号
-//                                String weight = new StringBuilder(data.substring(0, 7)).reverse().toString();
-//                                double weight_d = Double.parseDouble(weight);// 去掉两端的0字符
-//
-//                                //weightStr = ((int) (weight_d * 1000)) + ""; // 去掉小数点，转成int。用于兼容之前版本（用蓝牙获取的是整型）
-//
-//                                String str = format.format(weight_d); // 保留3位小数。用于实时显示重量数据
-//
-//                                //KLog.w("str = " + str);
-//                                EventBus.getDefault().post(new Weight(str));
-////                            mHandler.obtainMessage(0, str).sendToTarget();
-//                                //EventBus.getDefault().post(new WeightEvent()); // 不用EventBus或广播的原因就是我担心频繁的创建对象会消耗大量的资源
-//                                sb.setLength(0);
-//                            }
-//                        }
+                        if ((startIndex = sb.indexOf("=")) != -1 && (endIndex = sb.indexOf("=", startIndex + 1)) != -1) {
+                            // 两个等号之间有13位
+                            if ((endIndex - startIndex) < 9) { // 说明是错误数据
+                                sb.setLength(0);
+                            } else {
+                                String data = sb.substring(startIndex + 1, endIndex); // 第一位是等号
+                                String weight = new StringBuilder(data.substring(0, 7)).reverse().toString();
+                                double weight_d = Double.parseDouble(weight);// 去掉两端的0字符
+
+                                //weightStr = ((int) (weight_d * 1000)) + ""; // 去掉小数点，转成int。用于兼容之前版本（用蓝牙获取的是整型）
+
+                                String str = format.format(weight_d); // 保留3位小数。用于实时显示重量数据
+
+//                                KLog.i("WeightSerialPort: weight --> "+ str);
+                                EventBus.getDefault().post(new WeightEvent(str));
+                                sb.setLength(0);
+                            }
+                        }
                     }
-                    Thread.sleep(1000);
+                    Thread.sleep(200);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {

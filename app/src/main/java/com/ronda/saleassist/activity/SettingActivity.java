@@ -162,7 +162,7 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
         mSpinnerWeight.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                SPUtils.putString(AppConst.WEIGHT_SERIAL_PORT, mSpinnerCmd.getSelectedItem());
+                SPUtils.putString(AppConst.WEIGHT_SERIAL_PORT, mSpinnerWeight.getSelectedItem());
             }
 
             @Override

@@ -56,6 +56,18 @@ mobile + password + confirmPassword + nickname + code
 修改货物两个折扣，不能使用LSpinner, 要改为 EditText属性的View
 当是总额逢1进或逢5进的时候，CartBean#getDiscountCost() 到底要不要只保留两位小数，多的直接舍去
 
+指令
+
+浮框 --> 参考群图片
+    注意：总计的显示--> 先显示小计，过一会就显示总计
+
+模糊查询
+    数码管显示在确定一下
+
+
+
+
+
 待优化
 USB扫码 可以当成一个服务（这样只能是无障碍服务） 一直启动， 当检测到条码值时，就自动获取对应货物，添加至货篮
 

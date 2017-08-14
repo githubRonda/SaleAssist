@@ -22,6 +22,9 @@
     <!--震动-->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- 向windowManager中添加type为 WindowManager.LayoutParams.TYPE_PHONE 的权限 -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
     <application
         android:name=".base.MyApplication"
         android:allowBackup="true"
