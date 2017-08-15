@@ -76,6 +76,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -189,7 +190,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     public void onResume() {
         super.onResume();
 
-        //串口改变了
+        //若串口改变了，则重新初始化
         if (!SPUtils.getString(AppConst.WEIGHT_SERIAL_PORT, "").equals(weightComm)) {
             initReadWeightSerial();
         }
@@ -323,6 +324,11 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 //                    mWeightEvent = new DecimalFormat("0.00").format(Math.random() * 10); // 模拟一个随机值
                     if (mWeightEvent != null) {
                         weight = mWeightEvent.getWeight();
+                    }
+                    else{
+                        // TODO: 2017/8/15/0015
+                        weight = new DecimalFormat("0.00").format(Math.random() * 10);// 模拟一个随机值
+                        //ToastUtils.showToast("未获取到重量数据");
                     }
                 }
 

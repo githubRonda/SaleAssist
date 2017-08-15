@@ -29,8 +29,6 @@
     <string name="login">登录</string>
 
 
-
-
     <!--浮动数字键盘-->
     <string name="digitKeyppad_one">1</string>
     <string name="digitKeyppad_two">2</string>
@@ -45,7 +43,6 @@
     <string name="digitKeyppad_point">.</string>
     <string name="digitKeyppad_delete"><![CDATA[<<]]></string>
     <string name="digitKeyppad_ok">确定</string>
-
 
 
 </resources>

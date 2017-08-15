@@ -19,8 +19,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <!--震动-->
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 震动 -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <!-- 向windowManager中添加type为 WindowManager.LayoutParams.TYPE_PHONE 的权限 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
@@ -70,6 +70,8 @@
         <activity
             android:name=".activity.SettingActivity"
             android:screenOrientation="landscape"/>
+        <activity android:name=".activity.SellManageActivity">
+        </activity>
     </application>
 
 </manifest>

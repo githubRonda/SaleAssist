@@ -1,18 +1,26 @@
 package com.ronda.saleassist.fragment;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -36,6 +44,7 @@ import com.ronda.saleassist.base.dialog.DialogFactory;
 import com.ronda.saleassist.bean.CartBean;
 import com.ronda.saleassist.bean.OrderParamData;
 import com.ronda.saleassist.bean.PayEvent;
+import com.ronda.saleassist.bean.WeightEvent;
 import com.ronda.saleassist.db.OrderBean;
 import com.ronda.saleassist.dialog.GetOrderDialog;
 import com.ronda.saleassist.local.preference.SPUtils;
@@ -101,6 +110,11 @@ public class CartFragment extends BaseFragment {
     @BindView(R.id.btn_recharge)
     Button mBtnRecharge;
 
+
+    private WindowManager mWM;
+    private View mToastView;
+    private TextView mTvWeight;
+
     private static final String PAY_CASH = "cash";
     private static final String PAY_ALI = "alipay";
     private static final String PAY_WECHAT = "wechatpay";
@@ -123,6 +137,8 @@ public class CartFragment extends BaseFragment {
 
     @Override
     public void init(View view) {
+        mWM = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+
         mBtnPayAli.setEnabled(SPUtils.getBoolean(AppConst.SUPPORT_ALIPAY, true));
         mBtnPayWeixin.setEnabled(SPUtils.getBoolean(AppConst.SUPPORT_WECHATPAY, true));
 
@@ -142,6 +158,7 @@ public class CartFragment extends BaseFragment {
         });
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -149,7 +166,7 @@ public class CartFragment extends BaseFragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(CartBean cartBean) {
+    public void onEventAddGoods(CartBean cartBean) {
         KLog.i(cartBean.toString());
 
         if (mCartAdapter.getData().contains(cartBean)) {
@@ -167,7 +184,7 @@ public class CartFragment extends BaseFragment {
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEventMainThread(final PayEvent payEvent) {
+    public void onEventPay(final PayEvent payEvent) {
 
         KLog.e("payMethod ------> " + payEvent.getPayMethod());
 
@@ -192,6 +209,21 @@ public class CartFragment extends BaseFragment {
                 mHandler.sendEmptyMessage(payEvent.getPayMethod());
                 break;
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventGetWeight(final WeightEvent weightEvent) {
+        String weight = weightEvent.getWeight();
+        try {
+            if (Double.parseDouble(weight) == 0) {
+                hideToast();
+            } else {
+                showToast(weight);
+            }
+        } catch (Exception e) {
+            hideToast();
+        }
+        //KLog.i("MainActivity: weightEvent --> " + weightEvent.getWeight());
     }
 
     private Handler mHandler = new Handler() {
@@ -281,10 +313,12 @@ public class CartFragment extends BaseFragment {
                 showClearCartConfirmDialog();
                 break;
             case R.id.btn_add:
-                showAddDialog();
+                showToast("1.234");
+//                showAddDialog();
                 break;
             case R.id.btn_pay_cash:
-                EventBus.getDefault().post(new PayEvent(1, "现金支付 "));
+                hideToast();
+//                EventBus.getDefault().post(new PayEvent(1, "现金支付 "));
                 break;
             case R.id.btn_pay_ali:
                 break;
@@ -428,11 +462,7 @@ public class CartFragment extends BaseFragment {
             return;
         }
 
-//        KLog.e("hangUpOrder ==> " + new Gson().toJson(mCartAdapter.getData()));
-
         try {
-
-
             String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             CartBeanOrder order = new CartBeanOrder(null, date, getCurTotalCost(), new Gson().toJson(mCartAdapter.getData())); // 把数据序列化存储
             mCartBeanOrderDao.insert(order);
@@ -535,6 +565,49 @@ public class CartFragment extends BaseFragment {
                 EventBus.getDefault().post(cartBean);
             }
         });
+    }
+
+
+    /**
+     * 自定义归属地浮窗显示
+     */
+    private void showToast(String text) {
+        if (mToastView == null) {
+            final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            params.width = WindowManager.LayoutParams.WRAP_CONTENT;
+            params.format = PixelFormat.TRANSLUCENT;
+            params.windowAnimations = android.R.style.Animation_Toast;
+            params.type = WindowManager.LayoutParams.TYPE_TOAST;
+//            params.type = WindowManager.LayoutParams.TYPE_PHONE;
+            params.flags = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                    | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+            params.gravity = Gravity.LEFT + Gravity.TOP;
+            params.setTitle("Toast");
+//            params.x = 10;
+//            params.y = 50;
+
+            mToastView = LayoutInflater.from(mContext).inflate(R.layout.toast_address, null);
+            mTvWeight = (TextView) mToastView.findViewById(R.id.tv_weight);
+
+            mWM.addView(mToastView, params);
+//            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.push_left_in);
+            Animation animation = new TranslateAnimation(0, 0, 100, 0);
+            animation.setDuration(2000);
+            mToastView.startAnimation(animation);
+        }
+        mTvWeight.setText(text);
+    }
+
+    private void hideToast() {
+        if (mToastView != null) {
+            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.push_left_out);
+            mToastView.startAnimation(animation);
+
+            mWM.removeViewImmediate(mToastView);
+            mToastView = null;
+        }
     }
 
 
