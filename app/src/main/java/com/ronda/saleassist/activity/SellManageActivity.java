@@ -4,15 +4,10 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 
 import com.ronda.saleassist.R;
@@ -72,7 +67,7 @@ public class SellManageActivity extends BaseActivty {
         params.gravity = Gravity.LEFT + Gravity.CENTER_VERTICAL;
         params.setTitle("Toast");
 
-        mToastView = LayoutInflater.from(mContext).inflate(R.layout.toast_address, null);
+        mToastView = LayoutInflater.from(mContext).inflate(R.layout.toast_left_view, null);
         mTvWeight = (TextView) mToastView.findViewById(R.id.tv_weight);
         mToastView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
@@ -128,7 +123,7 @@ public class SellManageActivity extends BaseActivty {
             params.x = -200;
             params.y = 100;
 
-            mToastView = LayoutInflater.from(mContext).inflate(R.layout.toast_address, null);
+            mToastView = LayoutInflater.from(mContext).inflate(R.layout.toast_left_view, null);
             mTvWeight = (TextView) mToastView.findViewById(R.id.tv_weight);
 
             mToastView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);

@@ -136,7 +136,7 @@ public class SplashActivity extends BaseActivty {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        ToastUtils.showToast(error.getMessage());
+                        ToastUtils.showToast(R.string.no_respnose);
                         //若网络错误则直接跳转至登录界面
                         isSuccessOfToken = false;
                         goNextActivity();

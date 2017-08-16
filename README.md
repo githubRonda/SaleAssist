@@ -50,6 +50,13 @@ mobile + password + confirmPassword + nickname + code
 * 硬件相关功能
     * USB扫码 --> 绑定到MainActivity，一直执行，当监听到条码时，自动获取对应货物，添加至货篮
 
+* 浮窗
+    * 参考群图片
+    * 注意：总计的显示--> 先显示小计，过一会就显示总计
+
+
+
+
 
 
 待解决
@@ -70,7 +77,7 @@ mobile + password + confirmPassword + nickname + code
 
 待优化
 USB扫码 可以当成一个服务（这样只能是无障碍服务） 一直启动， 当检测到条码值时，就自动获取对应货物，添加至货篮
-
+使用提取出来的LeftView， 降低 CartFragment 类的复杂度
 
 
 No adapter attached; skipping layout

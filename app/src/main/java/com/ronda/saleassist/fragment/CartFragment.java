@@ -1,14 +1,13 @@
 package com.ronda.saleassist.fragment;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,9 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -39,13 +35,11 @@ import com.ronda.saleassist.api.volley.GsonUtil;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.BaseFragment;
 import com.ronda.saleassist.base.MyApplication;
-import com.ronda.saleassist.base.SPHelper;
 import com.ronda.saleassist.base.dialog.DialogFactory;
 import com.ronda.saleassist.bean.CartBean;
 import com.ronda.saleassist.bean.OrderParamData;
 import com.ronda.saleassist.bean.PayEvent;
 import com.ronda.saleassist.bean.WeightEvent;
-import com.ronda.saleassist.db.OrderBean;
 import com.ronda.saleassist.dialog.GetOrderDialog;
 import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.local.sqlite.GreenDaoHelper;
@@ -53,11 +47,10 @@ import com.ronda.saleassist.local.sqlite.table.CartBeanOrder;
 import com.ronda.saleassist.local.sqlite.table.CartBeanOrderDao;
 import com.ronda.saleassist.printer.PrintUtils;
 import com.ronda.saleassist.printer.USBPrinter;
-import com.ronda.saleassist.service.UploadOrderService;
 import com.ronda.saleassist.utils.MathCompute;
-import com.ronda.saleassist.utils.MusicUtil;
 import com.ronda.saleassist.utils.ToastUtils;
 import com.ronda.saleassist.view.DigitKeyboardView;
+import com.ronda.saleassist.view.LeftView;
 import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -112,8 +105,9 @@ public class CartFragment extends BaseFragment {
 
 
     private WindowManager mWM;
-    private View mToastView;
-    private TextView mTvWeight;
+    private View mLeftView;
+    private TextView mTvName, mTvWeight,mTvPrice,mTvTotalCount, mTvTotal;
+    private int mLeftViewWidth;
 
     private static final String PAY_CASH = "cash";
     private static final String PAY_ALI = "alipay";
@@ -128,6 +122,7 @@ public class CartFragment extends BaseFragment {
 
 
     private CartAdapter mCartAdapter;
+
 
     @Override
     public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -156,6 +151,8 @@ public class CartFragment extends BaseFragment {
                 showDeleteOneDialog(position);
             }
         });
+
+        initLeftView();
     }
 
 
@@ -163,6 +160,11 @@ public class CartFragment extends BaseFragment {
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this); //注销事件总线
+
+        if (mLeftView != null) {
+            mWM.removeView(mLeftView);
+            mLeftView = null;
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -181,8 +183,25 @@ public class CartFragment extends BaseFragment {
         mCartAdapter.notifyItemChanged(1); // 去掉上一个的背景色。直接使用 notifyDataSetChanged(); 没有动画效果
 
         updateTotalView(); //添加至货篮时更新总计
+
+        // 更新LeftView 浮框中的数据(重量由另一个事件总线控制)
+        mTvName.setText(cartBean.getName());
+        mTvPrice.setText(cartBean.getDiscountPrice());
+        mTvTotal.setText(cartBean.getDiscountCost());
+
+        //3s钟后，由小计变为总计
+        mHandler.removeCallbacks(mTotalRunanble);
+        mHandler.postDelayed(mTotalRunanble, 3000);
     }
 
+    private Runnable mTotalRunanble = new Runnable() {
+        @Override
+        public void run() {
+            mTvTotal.setText(getCurTotalCost());
+        }
+    };
+
+    //各种结算方式，使用EventBus的原因在于，物理按键也可以进行结算，这样便于统一管理
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEventPay(final PayEvent payEvent) {
 
@@ -190,9 +209,13 @@ public class CartFragment extends BaseFragment {
 
         switch (payEvent.getPayMethod()) {
             case 1: //现金
+                uploadOrder(PAY_CASH, "1", "", "", "", "", ""); //上传订单 现金
+                break;
             case 2: //挂账
+
+                break;
             case 3://会员支付
-                mHandler.sendEmptyMessage(payEvent.getPayMethod());
+//                mHandler.sendEmptyMessage(payEvent.getPayMethod());
                 break;
             case 4://支付宝
                 if (SPUtils.getBoolean(AppConst.SUPPORT_ALIPAY, false)) {
@@ -214,14 +237,17 @@ public class CartFragment extends BaseFragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventGetWeight(final WeightEvent weightEvent) {
         String weight = weightEvent.getWeight();
+
+        mTvWeight.setText(weight);
+
         try {
             if (Double.parseDouble(weight) == 0) {
-                hideToast();
+                hideLeftView();
             } else {
-                showToast(weight);
+                showLeftView();
             }
         } catch (Exception e) {
-            hideToast();
+            hideLeftView();
         }
         //KLog.i("MainActivity: weightEvent --> " + weightEvent.getWeight());
     }
@@ -313,12 +339,10 @@ public class CartFragment extends BaseFragment {
                 showClearCartConfirmDialog();
                 break;
             case R.id.btn_add:
-                showToast("1.234");
-//                showAddDialog();
+                showAddDialog();
                 break;
             case R.id.btn_pay_cash:
-                hideToast();
-//                EventBus.getDefault().post(new PayEvent(1, "现金支付 "));
+                EventBus.getDefault().post(new PayEvent(1, "现金支付 "));
                 break;
             case R.id.btn_pay_ali:
                 break;
@@ -569,45 +593,52 @@ public class CartFragment extends BaseFragment {
 
 
     /**
-     * 自定义归属地浮窗显示
+     * 自定义浮窗显示
      */
-    private void showToast(String text) {
-        if (mToastView == null) {
-            final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
-            params.width = WindowManager.LayoutParams.WRAP_CONTENT;
-            params.format = PixelFormat.TRANSLUCENT;
-            params.windowAnimations = android.R.style.Animation_Toast;
-            params.type = WindowManager.LayoutParams.TYPE_TOAST;
-//            params.type = WindowManager.LayoutParams.TYPE_PHONE;
-            params.flags = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                    | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                    | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-            params.gravity = Gravity.LEFT + Gravity.TOP;
-            params.setTitle("Toast");
-//            params.x = 10;
-//            params.y = 50;
+    private void initLeftView() {
+        final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        params.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        params.format = PixelFormat.TRANSLUCENT;
+        params.windowAnimations = android.R.style.Animation_Toast;
+        params.type = WindowManager.LayoutParams.TYPE_TOAST;
+        params.flags = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        params.gravity = Gravity.LEFT + Gravity.CENTER_VERTICAL;
+        params.setTitle("Toast");
 
-            mToastView = LayoutInflater.from(mContext).inflate(R.layout.toast_address, null);
-            mTvWeight = (TextView) mToastView.findViewById(R.id.tv_weight);
+        mLeftView = LayoutInflater.from(mContext).inflate(R.layout.toast_left_view, null);
+        mTvName = (TextView) mLeftView.findViewById(R.id.tv_name);
+        mTvWeight = (TextView) mLeftView.findViewById(R.id.tv_weight);
+        mTvPrice = (TextView) mLeftView.findViewById(R.id.tv_price);
+        mTvTotal = (TextView) mLeftView.findViewById(R.id.tv_subtotal_total);
+        mTvTotalCount = (TextView) mLeftView.findViewById(R.id.tv_total_count);
 
-            mWM.addView(mToastView, params);
-//            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.push_left_in);
-            Animation animation = new TranslateAnimation(0, 0, 100, 0);
-            animation.setDuration(2000);
-            mToastView.startAnimation(animation);
-        }
-        mTvWeight.setText(text);
+        mLeftView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        mLeftViewWidth = mLeftView.getMeasuredWidth();
+        mWM.addView(mLeftView, params);
     }
 
-    private void hideToast() {
-        if (mToastView != null) {
-            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.push_left_out);
-            mToastView.startAnimation(animation);
 
-            mWM.removeViewImmediate(mToastView);
-            mToastView = null;
+    public void showLeftView() {
+
+        if (mLeftView.getTranslationX() >= 0) { //完全展开
+            return;
         }
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mLeftView, "translationX", mLeftView.getTranslationX(), 0f);
+        animator.setDuration(800);
+        animator.start();
+    }
+
+    public void hideLeftView() {
+        if (mLeftView.getTranslationX() <= -mLeftViewWidth) { //完全收缩
+            return;
+        }
+
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mLeftView, "translationX", mLeftView.getTranslationX(), -mLeftViewWidth);
+        animator.setDuration(800);
+        animator.start();
     }
 
 
