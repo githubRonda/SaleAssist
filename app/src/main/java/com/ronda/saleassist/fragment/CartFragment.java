@@ -1,6 +1,7 @@
 package com.ronda.saleassist.fragment;
 
 import android.animation.ObjectAnimator;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -37,6 +38,7 @@ import com.ronda.saleassist.base.BaseFragment;
 import com.ronda.saleassist.base.MyApplication;
 import com.ronda.saleassist.base.dialog.DialogFactory;
 import com.ronda.saleassist.bean.CartBean;
+import com.ronda.saleassist.bean.CodeEvent;
 import com.ronda.saleassist.bean.OrderParamData;
 import com.ronda.saleassist.bean.PayEvent;
 import com.ronda.saleassist.bean.WeightEvent;
@@ -47,10 +49,12 @@ import com.ronda.saleassist.local.sqlite.table.CartBeanOrder;
 import com.ronda.saleassist.local.sqlite.table.CartBeanOrderDao;
 import com.ronda.saleassist.printer.PrintUtils;
 import com.ronda.saleassist.printer.USBPrinter;
+import com.ronda.saleassist.utils.CommonUtil;
 import com.ronda.saleassist.utils.MathCompute;
+import com.ronda.saleassist.utils.MusicUtil;
 import com.ronda.saleassist.utils.ToastUtils;
+import com.ronda.saleassist.view.ConfirmView;
 import com.ronda.saleassist.view.DigitKeyboardView;
-import com.ronda.saleassist.view.LeftView;
 import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -106,7 +110,7 @@ public class CartFragment extends BaseFragment {
 
     private WindowManager mWM;
     private View mLeftView;
-    private TextView mTvName, mTvWeight,mTvPrice,mTvTotalCount, mTvTotal;
+    private TextView mTvName, mTvWeight, mTvPrice, mTvTotalCount, mTvTotal;
     private int mLeftViewWidth;
 
     private static final String PAY_CASH = "cash";
@@ -115,6 +119,12 @@ public class CartFragment extends BaseFragment {
     private static final String PAY_LATER = "laterpay";
     private static final String PAY_VIP = "vippay";
 
+    private static final int VIP_CODE = 1;
+    private static final int ALIPAY_CODE = 2;
+    private static final int WECHATPAY_CODE = 3;
+
+    private int mCurCodeType = 0; // 结账时表示是哪种条码类型 （挂账(会员码), 支付宝，微信  都是18位）
+
     private String token = SPUtils.getString(AppConst.TOKEN, "");
     private String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
 
@@ -122,6 +132,9 @@ public class CartFragment extends BaseFragment {
 
 
     private CartAdapter mCartAdapter;
+    private Dialog payProgressDialog;
+    private ConfirmView mDialogConfirmView;
+    private TextView mDialogMessage;
 
 
     @Override
@@ -202,7 +215,7 @@ public class CartFragment extends BaseFragment {
     };
 
     //各种结算方式，使用EventBus的原因在于，物理按键也可以进行结算，这样便于统一管理
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventPay(final PayEvent payEvent) {
 
         KLog.e("payMethod ------> " + payEvent.getPayMethod());
@@ -211,27 +224,90 @@ public class CartFragment extends BaseFragment {
             case 1: //现金
                 uploadOrder(PAY_CASH, "1", "", "", "", "", ""); //上传订单 现金
                 break;
-            case 2: //挂账
 
-                break;
-            case 3://会员支付
-//                mHandler.sendEmptyMessage(payEvent.getPayMethod());
-                break;
-            case 4://支付宝
+            case 2://支付宝
                 if (SPUtils.getBoolean(AppConst.SUPPORT_ALIPAY, false)) {
                     ToastUtils.showToast("商家未开通支付宝当面付");
                     return;
                 }
-                mHandler.sendEmptyMessage(payEvent.getPayMethod());
+                mCurCodeType = ALIPAY_CODE;
+                showPayProcessDialog(ConfirmView.State.Progressing, "正在扫码...");
+
+//                mHandler.sendEmptyMessage(payEvent.getPayMethod());
+
+
                 break;
-            case 5://微信
+            case 3://微信
                 if (SPUtils.getBoolean(AppConst.SUPPORT_ALIPAY, false)) {
                     ToastUtils.showToast("商家未开通微信支付");
                     return;
                 }
                 mHandler.sendEmptyMessage(payEvent.getPayMethod());
                 break;
+            case 4: //挂账
+
+                break;
+            case 5://会员支付
+//                mHandler.sendEmptyMessage(payEvent.getPayMethod());
+                break;
         }
+    }
+
+    //获取条码：会员码，支付宝码， 微信码.
+    //获取到条码之后，根据当前的结算方式标记，上传订单数据
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventGetCode(CodeEvent codeEvent) {
+
+        String code = codeEvent.getCode();
+
+        switch (mCurCodeType){
+            case ALIPAY_CODE:
+                uploadOrder(PAY_ALI, "1", code, "", "", "", "");//上传订单 支付宝
+
+                mCurCodeType= 0; // 重置为0
+                break;
+            case WECHATPAY_CODE:
+
+                mCurCodeType= 0;
+                break;
+            case VIP_CODE:
+
+                mCurCodeType= 0;
+                break;
+        }
+    }
+
+
+    /**
+     * 结算时进度对话框
+     *
+     * @param state 三种状态
+     * @param msg   显示信息
+     */
+    private void showPayProcessDialog(ConfirmView.State state, String msg) {
+        if (payProgressDialog == null) {
+            payProgressDialog = new AlertDialog.Builder(getActivity()).create();
+            payProgressDialog.setCancelable(false);
+            payProgressDialog.getWindow().setContentView(R.layout.dialog_pay_process);
+
+            mDialogConfirmView = (ConfirmView) payProgressDialog.getWindow().findViewById(R.id.confirm_view);
+            mDialogMessage = (TextView) payProgressDialog.getWindow().findViewById(R.id.tv_message);
+            Button btnConfirm = (Button) payProgressDialog.getWindow().findViewById(R.id.btn_confirm);
+
+            btnConfirm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    payProgressDialog.dismiss();
+                }
+            });
+        }
+        if (!payProgressDialog.isShowing()) {
+            payProgressDialog.show();
+        }
+
+        mDialogConfirmView.animatedWithState(state);
+
+        mDialogMessage.setText(msg);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -264,7 +340,7 @@ public class CartFragment extends BaseFragment {
                 /*case 2: // 挂账
                     // 进行次数判断，当下位机连续按键多次的时候，只有第一次有效，可以避免出现多个对话框。
                     // 这种情况对于上位机来说是不存在的，因为点击按钮之后，对话框就会出来，此时按钮就是点击不了了。
-                    if (payConfirmDialog == null || (payConfirmDialog != null && !payConfirmDialog.isShowing())) {
+                    if (payProgressDialog == null || (payProgressDialog != null && !payProgressDialog.isShowing())) {
 //                        btnPayGuaZhang.performClick();
                         initMemberInfoAndOperateFrom(OPERATE_FROM_BALANCE);
                         showScanCodeDialog(CODE_MEMBER_DELAY_PAY);// 挂账 秤端
@@ -274,13 +350,13 @@ public class CartFragment extends BaseFragment {
                     downToScanGoodsCode();
                     break;
                 case 3: //支付宝
-                    if (payConfirmDialog == null || (payConfirmDialog != null && !payConfirmDialog.isShowing())) {
+                    if (payProgressDialog == null || (payProgressDialog != null && !payProgressDialog.isShowing())) {
                         initMemberInfoAndOperateFrom(OPERATE_FROM_BALANCE);
                         showScanCodeDialog(CODE_ALI_PAY); //支付宝 秤端
                     }
                     break;
                 case 5:
-                    if (payConfirmDialog == null || (payConfirmDialog != null && !payConfirmDialog.isShowing())) {
+                    if (payProgressDialog == null || (payProgressDialog != null && !payProgressDialog.isShowing())) {
                         initMemberInfoAndOperateFrom(OPERATE_FROM_BALANCE);
                         showScanCodeDialog(CODE_MEMBER_PAY); //会员支付 秤端
                     }
@@ -664,17 +740,19 @@ public class CartFragment extends BaseFragment {
 
         switch (method) {
             case PAY_CASH:
-
+                //打印
                 USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "现金"));
+                //上传
                 doUploadOrder(param_data, getCurTotalCost(), method, customer, "", "", "", "", "");
                 //清空数据
                 clearCart();
                 break;
-//            case PAY_ALI:
-//                hexData = CommonUtil.getDFFFHexStr(shopName, operator, dateStr, timeStr, mCartDatas, total, "支付宝", total);
-//                setPayProcessView(FLAG_PAY_PROCESSING, STATUS_UPLOADING, "正在支付，请稍后...");// 正在支付时，状态码时随便设的
-//                doUploadOrder(App.curShopId, param_data, total, method, customer, paycode, costprice, extmethod, extcode, extpay, hexData);
-//                break;
+            case PAY_ALI:
+                //打印
+                USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "支付宝"));
+                showPayProcessDialog(ConfirmView.State.Progressing, "正在支付，请稍后...");
+                doUploadOrder( param_data, getCurTotalCost(), method, customer, paycode, costprice, extmethod, extcode, extpay);
+                break;
 //            case PAY_WECHAT:
 //                hexData = CommonUtil.getDFFFHexStr(shopName, operator, dateStr, timeStr, mCartDatas, total, "微信", total);
 //                setPayProcessView(FLAG_PAY_PROCESSING, STATUS_UPLOADING, "正在支付，请稍后...");// 正在支付时，状态码时随便设的
@@ -718,13 +796,14 @@ public class CartFragment extends BaseFragment {
 
                                 String data = response.getString("data");//订单号
 
-//                                switch (method) {
-//                                    case PAY_WECHAT:
-//                                    case PAY_ALI:
-//                                        setPayProcessView(FLAG_PAY_SUCCESS, 1, "支付成功", hexData);
-//                                        //playMusic(context, R.raw.pay_successful);
-//                                        MusicUtil.playMusic(context, R.raw.pay_successful);
-//                                        break;
+                                switch (method) {
+                                    case PAY_WECHAT:
+                                    case PAY_ALI:
+                                        showPayProcessDialog(ConfirmView.State.Success, "支付成功");
+                                        closePayProcessDialogDelay();
+                                        MusicUtil.playMusic(mContext, R.raw.pay_successful);
+
+                                        break;
 //                                    case PAY_LATER:
 //                                        setPayProcessView(FLAG_PAY_SUCCESS, 1, "挂账成功", hexData);
 //                                        //playMusic(context, R.raw.laterpay_successful);
@@ -735,9 +814,9 @@ public class CartFragment extends BaseFragment {
 //                                        //playMusic(context, R.raw.pay_successful);
 //                                        MusicUtil.playMusic(context, R.raw.pay_successful);
 //                                        break;
-//                                }
-//
-//                                clearCart();//清空货篮
+                                }
+
+                                clearCart();//清空货篮
 //
 ////                        if (operateFrom != OPERATE_FROM_BALANCE) {
 ////                            downCurCartTotal(); //此时货篮中的总额为空，相当于下行清空指令
@@ -750,6 +829,12 @@ public class CartFragment extends BaseFragment {
 //                                //playMusic(context, R.raw.pay_failed);
 //                                MusicUtil.playMusic(context, R.raw.pay_failed);
                             }
+                            else{
+                                showPayProcessDialog(ConfirmView.State.Fail, "支付失败: "+ sub_msg);
+                                closePayProcessDialogDelay();
+
+                                MusicUtil.playMusic(mContext, R.raw.pay_failed);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Toast.makeText(MyApplication.getInstance(), "数据解析有误", Toast.LENGTH_SHORT).show();
@@ -760,10 +845,45 @@ public class CartFragment extends BaseFragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         ToastUtils.showToast("网络繁忙，支付失败！");
+
+                        closePayProcessDialogDelay();
                     }
                 });
     }
 
+    /**
+     * 立即关闭
+     */
+    private void closePayProcessDialogImmediate() {
+        if (payProgressDialog == null || !payProgressDialog.isShowing()){
+            return;
+        }
+
+        payProgressDialog.dismiss();
+    }
+
+
+    /**
+     * 延迟关闭
+     */
+    private void closePayProcessDialogDelay() {
+        if (payProgressDialog == null || !payProgressDialog.isShowing()){
+            return;
+        }
+
+        mHandler.removeCallbacks(mCloseDialogRunnable);
+        mHandler.postDelayed(mCloseDialogRunnable, 3000);
+    }
+
+    private Runnable mCloseDialogRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (payProgressDialog == null || !payProgressDialog.isShowing()){
+                return;
+            }
+            payProgressDialog.dismiss();
+        }
+    };
 
     //======================================内部类=================================================
     class CartAdapter extends BaseQuickAdapter<CartBean, BaseViewHolder> {

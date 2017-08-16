@@ -22,6 +22,7 @@ import com.ronda.saleassist.base.AppManager;
 import com.ronda.saleassist.base.BaseActivty;
 import com.ronda.saleassist.base.MyApplication;
 import com.ronda.saleassist.bean.CartBean;
+import com.ronda.saleassist.bean.CodeEvent;
 import com.ronda.saleassist.engine.BarcodeScannerResolver;
 import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.printer.USBPrinter;
@@ -185,16 +186,25 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
         mBarcodeScannerResolver.setScanSuccessListener(new BarcodeScannerResolver.OnScanSuccessListener() {
             @Override
             public void onScanSuccess(String barcode) {
+
+                ToastUtils.showToast("barcode: " + barcode);
+
+                // 扫货物条码，扫支付码，都必须要在MainActivity中进行
+                if (AppManager.getInstance().currentActivity() != MainActivity.this) {
+                    return;
+                }
+
                 //条码有8位和13位的
                 if (barcode.length() == 8 || barcode.length() == 13) {
                     //TODO 处理条码 （获取对应货物信息，添加至货篮）
-
-                    if (AppManager.getInstance().currentActivity() != MainActivity.this) {
-                        return;
-                    }
                     getGoodsInfoByCode(barcode);
                 }
-                ToastUtils.showToast("barcode: " + barcode);
+
+                // TODO: 2017/8/17/0017 支付码 ，但是会员码也是18位，要区分一下
+                if (barcode.length() == 18){
+                    EventBus.getDefault().post(new CodeEvent(barcode));
+                }
+
             }
         });
     }

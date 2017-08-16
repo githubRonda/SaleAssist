@@ -15,6 +15,7 @@ import android.hardware.usb.UsbManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.ronda.saleassist.utils.ToastUtils;
 import com.socks.library.KLog;
 
 import java.util.HashMap;
@@ -29,10 +30,10 @@ public class USBPrinter {
 
     private static USBPrinter mInstance;
 
-    private Context             mContext;
-    private UsbDevice           mUsbDevice;
-    private PendingIntent       mPermissionIntent;
-    private UsbManager          mUsbManager;
+    private Context mContext;
+    private UsbDevice mUsbDevice;
+    private PendingIntent mPermissionIntent;
+    private UsbManager mUsbManager;
     private UsbDeviceConnection mUsbDeviceConnection;
 
     private final BroadcastReceiver mUsbDeviceReceiver = new BroadcastReceiver() {
@@ -65,14 +66,12 @@ public class USBPrinter {
                         mUsbDeviceConnection.close();
                     }
                 }
-            }
-            else if(UsbManager.ACTION_USB_ACCESSORY_ATTACHED.equals(action)){
+            } else if (UsbManager.ACTION_USB_ACCESSORY_ATTACHED.equals(action)) {
                 KLog.i("ACTION_USB_ACCESSORY_ATTACHED");
-            }
-            else if(UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)){
+            } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
                 KLog.i("ACTION_USB_DEVICE_ATTACHED");
                 UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                KLog.d("device: "+device.getVendorId());
+                KLog.d("device: " + device.getVendorId());
                 mUsbManager.requestPermission(device, mPermissionIntent);
             }
         }
@@ -158,6 +157,10 @@ public class USBPrinter {
      * @param msg
      */
     public void print(byte[] msg) {
+        if (mUsbDevice == null) {
+            ToastUtils.showToast("未连接打印机");
+            return;
+        }
         final byte[] printData = msg;
         if (mUsbDevice != null) {
 
