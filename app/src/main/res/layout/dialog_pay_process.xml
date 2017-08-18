@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/transparent"
-              android:gravity="center">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    android:gravity="center"
+    >
 
+    <!--  android:layout_width="280dip"-->
     <LinearLayout
         android:layout_width="280dip"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@drawable/round_rect_white"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="10dip">
+            android:padding="10dip"
+            >
 
             <TextView
                 android:id="@+id/tv_title"
@@ -24,13 +29,15 @@
                 android:layout_height="wrap_content"
                 android:text="提示"
                 android:textColor="@color/red"
-                android:textSize="18sp"/>
+                android:textSize="18sp"
+                />
         </LinearLayout>
 
         <View
             android:layout_width="fill_parent"
             android:layout_height="1px"
-            android:background="@color/divider"/>
+            android:background="@color/divider"
+            />
 
         <LinearLayout
             android:id="@+id/content"
@@ -38,13 +45,15 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="16dip">
+            android:padding="16dip"
+            >
 
             <com.ronda.saleassist.view.ConfirmView
                 android:id="@+id/confirm_view"
                 android:layout_width="100dip"
                 android:layout_height="100dip"
-                android:layout_centerInParent="true"/>
+                android:layout_centerInParent="true"
+                />
 
             <TextView
                 android:id="@+id/tv_message"
@@ -54,7 +63,8 @@
                 android:gravity="center"
                 android:text="正在等待支付"
                 android:textColor="@color/gray"
-                android:textSize="15sp"/>
+                android:textSize="15sp"
+                />
 
             <!--<CheckBox
                 android:id="@+id/cb_print_bill"
@@ -126,32 +136,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dip"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            >
 
-           <!-- <Button
-                android:id="@+id/btn_cancel"
-                android:layout_width="0dp"
-                android:layout_height="35dip"
-                android:layout_marginLeft="10dip"
-                android:layout_marginRight="5dip"
-                android:layout_weight="1"
-                android:background="@drawable/selecter_button"
-                android:text="取消"
-                android:textColor="@color/white"
-                android:textSize="14sp"/>
+            <!-- <Button
+                 android:id="@+id/btn_cancel"
+                 android:layout_width="0dp"
+                 android:layout_height="35dip"
+                 android:layout_marginLeft="10dip"
+                 android:layout_marginRight="5dip"
+                 android:layout_weight="1"
+                 android:background="@drawable/selecter_button"
+                 android:text="取消"
+                 android:textColor="@color/white"
+                 android:textSize="14sp"/>
 
-            <Button
-                android:id="@+id/btn_pay_again"
-                android:layout_width="0dp"
-                android:layout_height="35dip"
-                android:layout_marginLeft="10dip"
-                android:layout_marginRight="5dip"
-                android:layout_weight="1"
-                android:background="@drawable/selecter_button"
-                android:text="再次支付"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:visibility="gone"/>-->
+             <Button
+                 android:id="@+id/btn_pay_again"
+                 android:layout_width="0dp"
+                 android:layout_height="35dip"
+                 android:layout_marginLeft="10dip"
+                 android:layout_marginRight="5dip"
+                 android:layout_weight="1"
+                 android:background="@drawable/selecter_button"
+                 android:text="再次支付"
+                 android:textColor="@color/white"
+                 android:textSize="14sp"
+                 android:visibility="gone"/>-->
 
             <Button
                 android:id="@+id/btn_confirm"

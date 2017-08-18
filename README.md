@@ -56,7 +56,21 @@ mobile + password + confirmPassword + nickname + code
 
 
 
+* 支付
+    * 所有的支付方式都通过 EventBus.getDefault().post(new PayEvent(PAY_LATER, "挂账支付 ")); 这种形式 统一交给 onEventDispatchPayMethod(final PayEvent payEvent) 来分发
+    * 现金支付： 直接在 onEventDispatchPayMethod() 中调用 uploadOrder()
+    * 支付宝：在 onEventDispatchPayMethod() 中，设置当 mCurCodeType 为 支付宝 类型，并且显示 PayProcessDialog.
+              然后在 onEventGetCode(CodeEvent codeEvent) 中接收到条码后，调用 uploadOrder(), 重置 mCurCodeType
+    * 微信：和支付宝一样
+    * 会员挂账：在 onEventDispatchPayMethod() 中，设置当 mCurCodeType 为 挂账 类型，并且显示 PayProcessDialog.
+            然后在 onEventGetCode(CodeEvent codeEvent) 中接收到条码后，调用 getMemberInfoByCode() 获取会员信息, 重置 mCurCodeType
+            最后在 getMemberInfoByCode() 中，当信息获取成功后，调用 uploadOrder() 方法
+    * 会员支付： 和会员挂账一样
 
+注意：
+1. 这里提高代码健壮性和安全性，使用了类似数据库的事务的原则，即若支付过程失败必须重新发起支付，不能在失败时候，继续支付
+2. 会员挂账和支付，比微信和支付宝多了获取会员信息这一步骤，然后才是上传订单。若获取会员信息出错，也要隐藏PayProcessDialog对话框
+3. 这里没有实现 会员支付时若余额不足，继续使用现金、支付宝、微信支付 功能
 
 
 待解决
@@ -65,7 +79,7 @@ mobile + password + confirmPassword + nickname + code
 
 指令
 
-浮框 --> 参考群图片
+浮框 --> 参考群图片 [完成]
     注意：总计的显示--> 先显示小计，过一会就显示总计
 
 模糊查询
@@ -85,9 +99,17 @@ mobile + password + confirmPassword + nickname + code
 
 串口读取，获取支付方式
 
+
+AlertDialog 和 windowManager.addView() 不能共存， windowManager的层级更高。若先 windowManager.addView() 则 AlertDialog.show() 不会显示出来
+而 LeftView 显示的时候就会造成 其他所有有关对话框的显示操作都会对于用户看不到
+所以，必须要修改，暂定方案为把浮窗放在CartFragment中的布局文件中
+
+
+
 待优化
 USB扫码 可以当成一个服务（这样只能是无障碍服务） 一直启动， 当检测到条码值时，就自动获取对应货物，添加至货篮
 使用提取出来的LeftView， 降低 CartFragment 类的复杂度
+这里没有实现 会员支付时若余额不足，继续使用现金、支付宝、微信支付 功能
 
 
 No adapter attached; skipping layout
@@ -120,9 +142,78 @@ http://blog.csdn.net/u014165119/article/details/46834265
 
 
 
+
 Frame中BaseActivity中DialogFactory
 
 
+
+    /**
+     * 自定义浮窗显示
+     */
+    private void initLeftView() {
+        mWM = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+
+        final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        params.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        params.format = PixelFormat.TRANSLUCENT;
+        params.windowAnimations = android.R.style.Animation_Toast;
+        //params.type = WindowManager.LayoutParams.TYPE_TOAST;
+        params.type = WindowManager.LayoutParams.TYPE_PHONE;
+        //params.flags = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        params.flags = WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        params.gravity = Gravity.LEFT + Gravity.CENTER_VERTICAL;
+        params.setTitle("Toast");
+
+        mLeftView = LayoutInflater.from(mContext).inflate(R.layout.toast_left_view, null);
+        mTvName = (TextView) mLeftView.findViewById(R.id.tv_name);
+        mTvWeight = (TextView) mLeftView.findViewById(R.id.tv_weight);
+        mTvPrice = (TextView) mLeftView.findViewById(R.id.tv_price);
+        mTvTotal = (TextView) mLeftView.findViewById(R.id.tv_subtotal_total);
+        mTvTotalCount = (TextView) mLeftView.findViewById(R.id.tv_total_count);
+
+        mLeftView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        mLeftViewWidth = mLeftView.getMeasuredWidth();
+        mWM.addView(mLeftView, params);
+
+        //ObjectAnimator animator = ObjectAnimator.ofFloat(mLeftView, "translationX", mLeftView.getTranslationX(), -mLeftViewWidth);
+        //animator.setDuration(0);
+        //animator.start();
+    }
+
+
+    public void showLeftView() {
+
+        if (mLeftView.getTranslationX() >= 0) { //完全展开
+            return;
+        }
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mLeftView, "translationX", mLeftView.getTranslationX(), 0f);
+        animator.setDuration(800);
+        animator.start();
+    }
+
+    public void hideLeftView() {
+        if (mLeftView.getTranslationX() <= -mLeftViewWidth) { //完全收缩
+            return;
+        }
+
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mLeftView, "translationX", mLeftView.getTranslationX(), -mLeftViewWidth);
+        animator.setDuration(800);
+        animator.start();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (mLeftView != null) {
+            mWM.removeView(mLeftView);
+            mLeftView = null;
+        }
+    }
 
 
     private void checkUpdate() {

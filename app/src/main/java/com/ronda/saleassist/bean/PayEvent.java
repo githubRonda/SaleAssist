@@ -7,19 +7,19 @@ package com.ronda.saleassist.bean;
  */
 
 public class PayEvent {
-    private int payMethod;
+    private String payMethod;
     private String msg;
 
-    public PayEvent(int payMethod, String msg) {
+    public PayEvent(String payMethod, String msg) {
         this.payMethod = payMethod;
         this.msg = msg;
     }
 
-    public int getPayMethod() {
+    public String getPayMethod() {
         return payMethod;
     }
 
-    public void setPayMethod(int payMethod) {
+    public void setPayMethod(String payMethod) {
         this.payMethod = payMethod;
     }
 

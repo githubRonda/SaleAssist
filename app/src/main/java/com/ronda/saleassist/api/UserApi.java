@@ -619,4 +619,29 @@ public class UserApi {
         VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
     }
 
+
+
+    //店铺会员支付扫码接口 根据会员码获取会员信息
+    public static void getMemberInfoByCode(String tag, final String token, final String shopid, final String qrcode, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_user_barcode", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("qrcode", qrcode);
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+
 }
