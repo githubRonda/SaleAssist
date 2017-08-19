@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ronda.saleassist.R;
+import com.ronda.saleassist.zznew.guazhang.GuaZhangListActivity;
 import com.ronda.saleassist.api.UserApi;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.AppManager;
@@ -180,15 +181,19 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
             case R.id.ll_sell_manage:
                 jump(SellManageActivity.class);
                 break;
+            case R.id.ll_setting:
+                jump(SettingActivity.class);
+                break;
+            case R.id.ll_guazhang_manage:
+                jump(GuaZhangListActivity.class);
+                break;
 //            case R.id.ll_stock_manage:
 //                jump(StockManageActivity.class);
 //                break;
 //            case R.id.ll_member_manage:
 //                jump(ManageVipActivity.class);
 //                break;
-            case R.id.ll_setting:
-                jump(SettingActivity.class);
-                break;
+
 //            case R.id.ll_shop_apply:
 //                jump(ShopApplyActivity.class);
 //                break;
@@ -204,9 +209,7 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
 //            case R.id.ll_order_manage:
 //                jump(OrderListActivity.class);
 //                break;
-//            case R.id.ll_guazhang_manage:
-//                jump(GuaZhangListActivity.class);
-//                break;
+
 
         }
         mDrawerLayout.closeDrawer(GravityCompat.END);//外层的DrawerLayout

@@ -130,6 +130,9 @@
         <activity android:name=".activity.VersionActivity"/>
         <activity android:name=".activity.ResetPassActivity"/>
         <activity android:name=".activity.UserSuggestionActivity"/>
+        <activity android:name=".zznew.guazhang.GuaZhangListActivity"/>
+        <activity android:name=".zznew.guazhang.GuaZhangOrderDetailActivity"/>
+        <activity android:name=".zznew.guazhang.GuaZhangOrderListActivity"/>
     </application>
 
 </manifest>

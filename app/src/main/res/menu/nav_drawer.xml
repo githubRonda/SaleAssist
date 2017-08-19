@@ -8,6 +8,7 @@
             android:icon="@drawable/drawer_action_share"
             android:title="挂账管理"/>
         <item
+            android:visible="false"
             android:id="@+id/ll_order_manage"
             android:icon="@drawable/drawer_action_collection"
             android:title="订单管理"/>
@@ -41,6 +42,7 @@
 
 
     <item
+        android:visible="false"
         android:id="@+id/ll_manage"
         android:icon="@drawable/drawer_action_share"
         android:title="员工管理"
