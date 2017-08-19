@@ -97,7 +97,9 @@ mobile + password + confirmPassword + nickname + code
 * 钱箱[待测试], 结算[完成]
 
 * 主界面侧边栏功能
-    *
+    * 设置
+        * 上传定位（manifest中配置key）
+
 
 
 

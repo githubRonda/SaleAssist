@@ -151,9 +151,9 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
                 SPUtils.putBoolean(AppConst.AUTO_UPGRADE, mToggleCheckUpgrade.isToggleOn());
                 break;
 
-//            case R.id.ll_location:
-//                startActivity(new Intent(this, LocationActivity.class));
-//                break;
+            case R.id.ll_location:
+                startActivity(new Intent(this, LocationActivity.class));
+                break;
 //            case R.id.ll_version_info:
 //                startActivity(new Intent(this, VersionActivity.class).putExtra("version", getVersion()));
 //                break;

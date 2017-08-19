@@ -589,10 +589,45 @@ public class UserApi {
      * /market/api/order_member_info_goods
      */
 
+
     /**
      * 上传定位信息
-     * /market/api/alipay_location_info_upload
+     *
+     * @param shopid       商店id
+     * @param province     省份
+     * @param city         城市
+     * @param districtcode 区县编码
+     * @param address      详细地址
+     * @param longitude    经度
+     * @param latitude     纬度
      */
+
+    public static void uploadLocation(String tag, final String token, final String shopid, final String province, final String city, final String districtcode, final String address, final double longitude, final double latitude,
+                                      Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/alipay_location_info_upload", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("province", province);
+                params.put("city", city);
+                params.put("districtcode", districtcode);
+                params.put("address", address);
+                params.put("longitude", longitude + "");
+                params.put("latitude", latitude + "");
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
 
 
     /**

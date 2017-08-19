@@ -139,6 +139,8 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.5.1'
     //annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1' // 注意这个不能再使用annotationProcessor前缀了，因为在本文件的顶部引入了android-apt插件，所以要换成apt，否则会导致butterKnife失效
     apt 'com.jakewharton:butterknife-compiler:8.5.1'
+
+    compile 'com.amap.api:location:3.3.0'
 //    //dagger 2
 //    apt 'com.google.dagger:dagger-compiler:2.10'
 //    compile 'com.google.dagger:dagger:2.10'
