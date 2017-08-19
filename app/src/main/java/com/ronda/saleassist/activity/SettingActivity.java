@@ -168,9 +168,9 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
             case R.id.ll_modify_pass:
                 startActivity(new Intent(this, ResetPassActivity.class));
                 break;
-//            case R.id.ll_user_suggestion:
-//                startActivity(new Intent(this, UserSuggestionActivity.class));
-//                break;
+            case R.id.ll_user_suggestion:
+                startActivity(new Intent(this, UserSuggestionActivity.class));
+                break;
             case R.id.btn_exit:
                 AppManager.getInstance().finishAllActivity();
                 Intent intent = new Intent(SettingActivity.this, LoginActivity.class);

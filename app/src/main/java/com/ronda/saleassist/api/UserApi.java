@@ -709,6 +709,33 @@ public class UserApi {
         VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
     }
 
+    /**
+     * 用户反馈
+     *
+     * @param user
+     * @param method
+     * @param content
+     */
 
+    public static void uploadSuggestion(String tag, final String user, final String method, final String content,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/suggestion", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("user", user);
+                params.put("method", method);
+                params.put("content", content);
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
 
 }
