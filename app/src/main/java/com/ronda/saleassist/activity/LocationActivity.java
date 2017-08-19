@@ -18,6 +18,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ronda.saleassist.R;
 import com.ronda.saleassist.api.UserApi;
+import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.utils.ToastUtils;
@@ -85,6 +86,12 @@ public class LocationActivity extends CheckPermissionsActivity implements View.O
         locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Battery_Saving);
         //设置定位监听
         locationClient.setLocationListener(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        VolleyUtil.getInstance().cancelPendingRequests(TAG);
     }
 
     private void initView() {

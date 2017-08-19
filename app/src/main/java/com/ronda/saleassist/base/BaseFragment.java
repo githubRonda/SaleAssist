@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.dialog.DialogFactory;
 
 import butterknife.ButterKnife;
@@ -59,5 +60,7 @@ public abstract class BaseFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+
+        VolleyUtil.getInstance().cancelPendingRequests(TAG);
     }
 }

@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.ronda.saleassist.R;
+import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.dialog.DialogFactory;
 
 /**
@@ -84,6 +85,8 @@ public abstract class BaseActivty extends AppCompatActivity {
 
         AppManager.logActivityStack();
         System.gc();
+
+        VolleyUtil.getInstance().cancelPendingRequests(TAG);
     }
 
 

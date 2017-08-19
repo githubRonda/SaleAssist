@@ -128,6 +128,7 @@
         <activity android:name=".activity.SellManageActivity"/>
         <activity android:name=".activity.LocationActivity"/>
         <activity android:name=".activity.VersionActivity"/>
+        <activity android:name=".activity.ResetPassActivity"/>
     </application>
 
 </manifest>

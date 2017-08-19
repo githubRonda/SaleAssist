@@ -6,6 +6,7 @@ import android.os.Process;
 
 import com.ronda.saleassist.BuildConfig;
 import com.ronda.saleassist.api.volley.VolleyUtil;
+import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.local.sqlite.GreenDaoHelper;
 import com.ronda.saleassist.activity.MainActivity;
 import com.ronda.saleassist.R;
@@ -77,7 +78,7 @@ public class MyApplication extends Application {
          * true表示初始化时自动检查升级
          * false表示不会自动检查升级，需要手动调用Beta.checkUpgrade()方法
          */
-        Beta.autoCheckUpgrade = true;
+        Beta.autoCheckUpgrade = SPUtils.getBoolean(AppConst.AUTO_UPGRADE, true);
 
         /**
          * 设置升级周期为60s（默认检查周期为0s），60s内SDK不重复向后台请求策略

@@ -679,4 +679,36 @@ public class UserApi {
 
 
 
+    /**
+     * 修改密码
+     * （当不传入新密码时，系统将以手机短信的形式通知用户新的随机密码）
+     *
+     * @param password
+     * @param newpassword
+     */
+
+    public static void resetPassword(String tag, final String token, final String shopid,final String password, final String newpassword,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/password_reset", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("password", password);
+                params.put("newpassword", newpassword);
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+
 }

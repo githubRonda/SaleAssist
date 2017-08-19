@@ -100,7 +100,9 @@ mobile + password + confirmPassword + nickname + code
     * 设置
         * 上传定位（manifest中配置key）
         * 版本信息
-        * 检查更新 (build.gradle中配置appId和appkey)
+        * 手动检查更新 (build.gradle中配置appId和appkey)，自动检查更新：Beta.autoCheckUpgrade = true(MyApplication)
+        * 修改密码
+        * 用户反馈
 
 
 

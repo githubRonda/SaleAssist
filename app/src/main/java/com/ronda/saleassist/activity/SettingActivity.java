@@ -148,9 +148,11 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
                 SPUtils.putBoolean(AppConst.PRINT_BILL, mTogglePrintBill.isToggleOn());
                 break;
             case R.id.toggle_print_new_order:
+                setToggleButton(mTogglePrintNewOrder, !mTogglePrintNewOrder.isToggleOn());
                 SPUtils.putBoolean(AppConst.PRINT_NEW_ORDER, mTogglePrintNewOrder.isToggleOn());
                 break;
             case R.id.toggle_auto_check_upgrade:
+                setToggleButton(mToggleCheckUpgrade, !mToggleCheckUpgrade.isToggleOn());
                 SPUtils.putBoolean(AppConst.AUTO_UPGRADE, mToggleCheckUpgrade.isToggleOn());
                 break;
 
@@ -163,9 +165,9 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
             case R.id.ll_check_update:
                 Beta.checkUpgrade();
                 break;
-//            case R.id.ll_modify_pass:
-//                startActivity(new Intent(this, ResetPassActivity.class));
-//                break;
+            case R.id.ll_modify_pass:
+                startActivity(new Intent(this, ResetPassActivity.class));
+                break;
 //            case R.id.ll_user_suggestion:
 //                startActivity(new Intent(this, UserSuggestionActivity.class));
 //                break;
