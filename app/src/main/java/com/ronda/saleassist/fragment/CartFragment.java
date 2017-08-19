@@ -790,22 +790,26 @@ public class CartFragment extends BaseFragment {
 
         switch (method) {
             case PAY_CASH:
-                //打印
-                USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "现金"));
+                if (SPUtils.getBoolean(AppConst.PRINT_BILL, true)){
+                    //打印
+                    USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "现金"));
+                }
                 //上传
                 doUploadOrder(param_data, getCurTotalCost(), method, customer, "", "", "", "", "");
                 //清空数据
                 clearCart();
                 break;
             case PAY_ALI:
-                //打印
-                USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "支付宝"));
+                if (SPUtils.getBoolean(AppConst.PRINT_BILL, true)){
+                    USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "支付宝"));
+                }
                 showPayProcessDialog(ConfirmView.State.Progressing, "正在支付，请稍后...");
                 doUploadOrder(param_data, getCurTotalCost(), method, customer, paycode, costprice, extmethod, extcode, extpay);
                 break;
             case PAY_WECHAT:
-                //打印
-                USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "微信"));
+                if (SPUtils.getBoolean(AppConst.PRINT_BILL, true)){
+                    USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "微信"));
+                }
                 showPayProcessDialog(ConfirmView.State.Progressing, "正在支付，请稍后...");
                 String costprice_t = getCurTotalCost();
                 if (!costprice.isEmpty()) {
@@ -814,13 +818,16 @@ public class CartFragment extends BaseFragment {
                 doUploadOrder(param_data, getCurTotalCost(), method, customer, paycode, costprice_t, extmethod, extcode, extpay); //微信支付比较特殊，非会员支付的时候也要传costprice,不过这时就等于 total
                 break;
             case PAY_LATER:
-                //打印
-                USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "挂账"));
+                if (SPUtils.getBoolean(AppConst.PRINT_BILL, true)){
+                    USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "挂账"));
+                }
                 showPayProcessDialog(ConfirmView.State.Progressing, "正在挂账，请稍后...");
                 doUploadOrder(param_data, getCurTotalCost(), method, customer, paycode, costprice, extmethod, extcode, extpay);
                 break;
             case PAY_VIP://会员支付。获取会员信息后，若余额充足时，直接就走这个接口。若余额不足时，若选择支付宝支付，在按到支付码后继续走此接口；若选择现金支付，则继续走此接口
-                USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "会员支付"));
+                if (SPUtils.getBoolean(AppConst.PRINT_BILL, true)){
+                    USBPrinter.getInstance().print(PrintUtils.generateBillData(mCartAdapter.getData(), getCurTotalCost(), "会员支付"));
+                }
                 showPayProcessDialog(ConfirmView.State.Progressing, "正在支付，请稍后...");
                 doUploadOrder(param_data, getCurTotalCost(), method, customer, paycode, costprice, extmethod, extcode, extpay);
                 break;

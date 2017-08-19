@@ -85,4 +85,24 @@ public interface AppConst {
      * 交互指令串口
      */
     String CMD_SERIAL_PORT = "cmd_serial_port";
+
+    /**
+     * 设置中是否显示主界面中的折扣对话框
+     */
+    String SHOW_DISCOUNT_DIALOG = "show_discount_dialog";
+
+    /**
+     * 结算时是否打印小票
+     */
+    String PRINT_BILL = "print_bill";
+
+    /**
+     * 新订单时是否打印小票
+     */
+    String PRINT_NEW_ORDER = "print_new_order";
+
+    /**
+     * 是否自动更新
+     */
+    String AUTO_UPGRADE = "auto_upgrade";
 }

@@ -42,7 +42,7 @@
     <!--不一定要是NavigationView,可以是任何布局View,eg:LinearLayout-->
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
         app:headerLayout="@layout/nav_header"

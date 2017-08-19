@@ -1,48 +1,20 @@
 package com.ronda.saleassist.activity;
 
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v7.app.AlertDialog;
-import android.util.Xml;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
 
 import com.ronda.saleassist.R;
-import com.ronda.saleassist.api.UserApi;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.AppManager;
 import com.ronda.saleassist.base.BaseActivty;
-import com.ronda.saleassist.base.SPHelper;
 import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.serialport.SerialPortFinder;
 import com.ronda.saleassist.view.LSpinner;
 import com.ronda.saleassist.view.togglebutton.ToggleButton;
-import com.tencent.bugly.beta.Beta;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 
 public class SettingActivity extends BaseActivty implements View.OnClickListener {
 
@@ -57,14 +29,8 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
     private ToggleButton mTogglePrintNewOrder;  // 是否打印新订单
     private ToggleButton mToggleCheckUpgrade;
 
-//    private TextView mTxtBluetoothAddr;
-
     private Button btnExit;
 
-    private ProgressDialog checkDialog, progress;
-    String version = null;
-    String description = null;
-    String url = null;
     private LSpinner<String> mSpinnerCmd;
     private LSpinner<String> mSpinnerWeight;
 
@@ -117,32 +83,16 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
 
 
         // 设置toggle的状态 --> 点击菜品时是否显示折扣对话框
-        if (SPHelper.getSettingDiscountDialog()) {
-            mToggleDiscountDialog.setToggleOn();
-        } else {
-            mToggleDiscountDialog.setToggleOff();
-        }
+        setToggleButton(mToggleDiscountDialog, SPUtils.getBoolean(AppConst.SHOW_DISCOUNT_DIALOG, false));
 
-        // 设置toggle的状态 --> 点击菜品时是否显示折扣对话框
-        if (SPHelper.getSettingPrintBill()) {
-            mTogglePrintBill.setToggleOn();
-        } else {
-            mTogglePrintBill.setToggleOff();
-        }
+        // 设置toggle的状态 --> 结算时是否打印
+        setToggleButton(mTogglePrintBill, SPUtils.getBoolean(AppConst.PRINT_BILL, true));
 
         // 设置toggle的状态 --> 买家下新订单时是否打印小票
-        if (SPHelper.getSettingPrintNewOrder()){
-            mTogglePrintNewOrder.setToggleOn();
-        }else{
-            mTogglePrintNewOrder.setToggleOff();
-        }
+//        setToggleButton(mTogglePrintNewOrder, SPUtils.getBoolean(AppConst.PRINT_NEW_ORDER, true));
 
         // 设置toggle的状态 --> 启动程序时是否自动检查更新
-        if (SPHelper.getSettingAutoCheck()) {
-            mToggleCheckUpgrade.toggleOn();
-        } else {
-            mToggleCheckUpgrade.toggleOff();
-        }
+        setToggleButton(mToggleCheckUpgrade, SPUtils.getBoolean(AppConst.AUTO_UPGRADE, true));
     }
 
     private void initEvent() {
@@ -189,57 +139,18 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.toggle_discount_dialog:
-                if (SPHelper.getSettingDiscountDialog()) {
-                    mToggleDiscountDialog.setToggleOff();
-                    SPHelper.setSettingDiscountDialog(false);
-                } else {
-                    mToggleDiscountDialog.setToggleOn();
-                    SPHelper.setSettingDiscountDialog(true);
-                }
+                SPUtils.putBoolean(AppConst.SHOW_DISCOUNT_DIALOG, mToggleDiscountDialog.isToggleOn());
                 break;
             case R.id.toggle_default_print_bill:
-                if (SPHelper.getSettingPrintBill()){
-                    mTogglePrintBill.setToggleOff();
-                    SPHelper.setSettingPrintBill(false);
-                }
-                else{
-                    mTogglePrintBill.setToggleOn();
-                    SPHelper.setSettingPrintBill(true);
-                }
+                SPUtils.putBoolean(AppConst.PRINT_BILL, mTogglePrintBill.isToggleOn());
                 break;
             case R.id.toggle_print_new_order:
-                if (SPHelper.getSettingPrintNewOrder()){
-                    mTogglePrintNewOrder.setToggleOff();
-                    SPHelper.setSettingPrintNewOrder(false);
-                }
-                else {
-                    mTogglePrintNewOrder.setToggleOn();
-                    SPHelper.setSettingPrintNewOrder(true);
-                }
+                SPUtils.putBoolean(AppConst.PRINT_NEW_ORDER, mTogglePrintNewOrder.isToggleOn());
                 break;
             case R.id.toggle_auto_check_upgrade:
-                if (SPHelper.getSettingAutoCheck()){
-                    mToggleCheckUpgrade.setToggleOff();
-                    SPHelper.setSettingAutoCheck(false);
-                }
-                else{
-                    mToggleCheckUpgrade.setToggleOn();
-                    SPHelper.setSettingAutoCheck(true);
-                }
+                SPUtils.putBoolean(AppConst.AUTO_UPGRADE, mToggleCheckUpgrade.isToggleOn());
                 break;
 
-//            case R.id.btn_clear_bluetooth_addr:
-//                SPHelper.setMainBluetoothAddr("");
-//                // 设置蓝牙地址的显示
-//                String addr = SPHelper.getMainBluetoothAddr();
-//                if (addr.isEmpty()){
-//                    mTxtBluetoothAddr.setText("无缓存蓝牙地址");
-//                    Bluetooth.getBluetoothInstance().cancelAutoConnect();
-//                }else {
-//                    mTxtBluetoothAddr.setText("缓存蓝牙:"+addr);
-//                }
-//
-//                break;
 //            case R.id.ll_location:
 //                startActivity(new Intent(this, LocationActivity.class));
 //                break;
@@ -256,16 +167,28 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
 //            case R.id.ll_user_suggestion:
 //                startActivity(new Intent(this, UserSuggestionActivity.class));
 //                break;
-//            case R.id.btn_exit:
-//
-//                Bluetooth.getBluetoothInstance().stop();
-//                AppManager.getInstance().finishAllActivity();
-//                //AppManager.getInstance().clear();
-//                Intent intent = new Intent(SettingActivity.this, LoginActivity.class);
-//                startActivity(intent);
-//                UserApi.cancelAll();
-//                break;
+            case R.id.btn_exit:
+                AppManager.getInstance().finishAllActivity();
+                Intent intent = new Intent(SettingActivity.this, LoginActivity.class);
+                startActivity(intent);
+                break;
         }
+    }
+
+
+    private void setToggleButton(ToggleButton toggleButton, boolean isCheck){
+
+        if (isCheck){
+            if (!toggleButton.isToggleOn()){
+                toggleButton.setToggleOn();
+            }
+        }
+        else{
+            if (toggleButton.isToggleOn()){
+                toggleButton.setToggleOff();
+            }
+        }
+
     }
 
 
