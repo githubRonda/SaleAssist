@@ -124,6 +124,7 @@
             android:screenOrientation="landscape"/>
         <activity android:name=".activity.SellManageActivity"/>
         <activity android:name=".activity.LocationActivity"/>
+        <activity android:name=".activity.VersionActivity"/>
     </application>
 
 </manifest>

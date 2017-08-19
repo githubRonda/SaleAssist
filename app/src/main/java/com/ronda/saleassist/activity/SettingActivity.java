@@ -154,9 +154,9 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
             case R.id.ll_location:
                 startActivity(new Intent(this, LocationActivity.class));
                 break;
-//            case R.id.ll_version_info:
-//                startActivity(new Intent(this, VersionActivity.class).putExtra("version", getVersion()));
-//                break;
+            case R.id.ll_version_info:
+                startActivity(new Intent(this, VersionActivity.class));
+                break;
 //            case R.id.ll_check_update:
 ////                checkUpdate();
 //                Beta.checkUpgrade();
