@@ -45,7 +45,7 @@ public class MyApplication extends Application {
         KLog.init(BuildConfig.LOG_DEBUG, "Liu");
 
         // bugly_upgrade 初始化
-//        setBuglyUpdate();
+        setBuglyUpdate();
 
         // GreenDao初始化
         GreenDaoHelper.initDatabase();

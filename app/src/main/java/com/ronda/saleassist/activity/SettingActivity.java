@@ -15,6 +15,7 @@ import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.serialport.SerialPortFinder;
 import com.ronda.saleassist.view.LSpinner;
 import com.ronda.saleassist.view.togglebutton.ToggleButton;
+import com.tencent.bugly.beta.Beta;
 
 public class SettingActivity extends BaseActivty implements View.OnClickListener {
 
@@ -139,9 +140,11 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.toggle_discount_dialog:
+                setToggleButton(mToggleDiscountDialog, !mToggleDiscountDialog.isToggleOn());
                 SPUtils.putBoolean(AppConst.SHOW_DISCOUNT_DIALOG, mToggleDiscountDialog.isToggleOn());
                 break;
             case R.id.toggle_default_print_bill:
+                setToggleButton(mTogglePrintBill, !mTogglePrintBill.isToggleOn());
                 SPUtils.putBoolean(AppConst.PRINT_BILL, mTogglePrintBill.isToggleOn());
                 break;
             case R.id.toggle_print_new_order:
@@ -157,10 +160,9 @@ public class SettingActivity extends BaseActivty implements View.OnClickListener
             case R.id.ll_version_info:
                 startActivity(new Intent(this, VersionActivity.class));
                 break;
-//            case R.id.ll_check_update:
-////                checkUpdate();
-//                Beta.checkUpgrade();
-//                break;
+            case R.id.ll_check_update:
+                Beta.checkUpgrade();
+                break;
 //            case R.id.ll_modify_pass:
 //                startActivity(new Intent(this, ResetPassActivity.class));
 //                break;
