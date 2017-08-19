@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <include layout="@layout/include_toolbar"/>
+
+    <!--待审核会员-->
+    <LinearLayout
+        android:id="@+id/ll_new_member"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/click_bg_change"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight="1"
+            android:text="待审核会员"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="8dp"
+            android:layout_height="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_arrow" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/lightgray" />
+
+    <!--所有会员-->
+    <LinearLayout
+        android:id="@+id/ll_all_member"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/click_bg_change"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight="1"
+            android:text="所有会员"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="8dp"
+            android:layout_height="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_arrow" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/lightgray" />
+
+    <!--会员等级设置-->
+    <LinearLayout
+        android:id="@+id/ll_vip_level"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/click_bg_change"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight="1"
+            android:text="等级设置"
+            android:textColor="@color/gray"
+            android:textSize="16sp"
+            android:id="@+id/textView"/>
+
+        <ImageView
+            android:layout_width="8dp"
+            android:layout_height="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_arrow" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/lightgray" />
+
+
+    <!--会员优惠项设置-->
+    <LinearLayout
+        android:id="@+id/ll_vip_preference"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/click_bg_change"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight="1"
+            android:text="优惠项设置"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="8dp"
+            android:layout_height="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_arrow" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/lightgray" />
+
+
+    <!--会员配送费设置-->
+    <LinearLayout
+        android:id="@+id/ll_vip_extra_cost"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/click_bg_change"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight="1"
+            android:text="配送费设置"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="8dp"
+            android:layout_height="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_arrow" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/lightgray" />
+
+    <!--会员推送设置-->
+    <LinearLayout
+        android:id="@+id/ll_push_ad"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/click_bg_change"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight="1"
+            android:text="推送优惠"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="8dp"
+            android:layout_height="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_arrow" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/lightgray" />
+
+</LinearLayout>

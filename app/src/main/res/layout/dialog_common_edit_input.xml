@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--公共的删除的时候的提示-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/transparent"
+              android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/round_rect_white"
+        android:orientation="vertical">
+
+        <!--标题-->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dip">
+
+            <TextView
+                android:id="@+id/txt_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="标题"
+                android:textColor="@color/red"
+                android:textSize="18sp"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="@color/divider"/>
+
+        <!--内容区-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edit_input"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:gravity="center"
+                android:hint="0"
+                android:text=""
+                android:textColor="@color/gray"
+                android:textSize="15sp"/>
+
+            <!--右边数字键盘-->
+            <com.ronda.saleassist.view.DigitKeyboardView
+                android:id="@+id/ll_keyboard"
+                android:layout_width="280dip"
+                android:layout_height="wrap_content"
+                ></com.ronda.saleassist.view.DigitKeyboardView>
+        </LinearLayout>
+
+        <!--底部按钮-->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="fill_parent"
+                android:layout_height="35dip"
+                android:layout_marginLeft="10dip"
+                android:layout_marginRight="5dip"
+                android:layout_weight="1"
+                android:background="@drawable/selecter_button"
+                android:text="取消"
+                android:textColor="@color/white"
+                android:textSize="14sp"/>
+
+            <Button
+                android:id="@+id/btn_confirm"
+                android:layout_width="fill_parent"
+                android:layout_height="35dip"
+                android:layout_marginLeft="5dip"
+                android:layout_marginRight="10dip"
+                android:layout_weight="1"
+                android:background="@drawable/selecter_button"
+                android:text="确定"
+                android:textColor="@color/white"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

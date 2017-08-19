@@ -133,6 +133,14 @@
         <activity android:name=".zznew.guazhang.GuaZhangListActivity"/>
         <activity android:name=".zznew.guazhang.GuaZhangOrderDetailActivity"/>
         <activity android:name=".zznew.guazhang.GuaZhangOrderListActivity"/>
+        <activity android:name=".activity.member.ApplicantListActivity"/>
+        <activity android:name=".activity.member.ManageVipActivity"/>
+        <activity android:name=".activity.member.PeiSongCostActivity"/>
+        <activity android:name=".activity.member.PushAdActivity"/>
+        <activity android:name=".activity.member.VipLevelActivity"/>
+        <activity android:name=".activity.member.VipListActivity"/>
+        <activity android:name=".activity.member.VipListDetailActivity"/>
+        <activity android:name=".activity.member.VipPreferenceActivity"/>
     </application>
 
 </manifest>

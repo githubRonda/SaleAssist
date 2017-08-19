@@ -498,10 +498,10 @@ public class UserApi {
      * <p>
      * //@param token  令牌
      *
-     * @param shopid  商店id
-     * @param data    订单数据（json数组格式字符串）
-     *                number  该货物数量（重量）
-     *                goodId  货物id
+     * @param shopid 商店id
+     * @param data   订单数据（json数组格式字符串）
+     *               number  该货物数量（重量）
+     *               goodId  货物id
      */
     public static void uploadOrder(String tag, String token, String shopid, String data, String total, String paycode, String method, String customer,
                                    Response.Listener<String> listener, Response.ErrorListener errorListener) {
@@ -629,7 +629,6 @@ public class UserApi {
     }
 
 
-
     /**
      * 条码货物扫码信息获取接口：
      */
@@ -655,7 +654,6 @@ public class UserApi {
     }
 
 
-
     //店铺会员支付扫码接口 根据会员码获取会员信息
     public static void getMemberInfoByCode(String tag, final String token, final String shopid, final String qrcode, Response.Listener<String> listener, Response.ErrorListener errorListener) {
 
@@ -678,7 +676,6 @@ public class UserApi {
     }
 
 
-
     /**
      * 修改密码
      * （当不传入新密码时，系统将以手机短信的形式通知用户新的随机密码）
@@ -687,8 +684,8 @@ public class UserApi {
      * @param newpassword
      */
 
-    public static void resetPassword(String tag, final String token, final String shopid,final String password, final String newpassword,
-                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    public static void resetPassword(String tag, final String token, final String shopid, final String password, final String newpassword,
+                                     Response.Listener<String> listener, Response.ErrorListener errorListener) {
 
         if (!NetUtils.isConnected(MyApplication.getInstance())) {
             ToastUtils.showToast("无网络连接");
@@ -718,7 +715,7 @@ public class UserApi {
      */
 
     public static void uploadSuggestion(String tag, final String user, final String method, final String content,
-                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+                                        Response.Listener<String> listener, Response.ErrorListener errorListener) {
 
         if (!NetUtils.isConnected(MyApplication.getInstance())) {
             ToastUtils.showToast("无网络连接");
@@ -737,5 +734,399 @@ public class UserApi {
         };
         VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
     }
+
+
+    //买家申请VIP处理接口
+    public static void applyProcess(String tag, final String token, final String shopid, final String data,
+                                    Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_user_apply_notify", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("data", data);//json字符串，(id(申请时的), status(2,3,4), level(会员等级))
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    //买家申请店铺VIP轮询接口
+    public static void applyMember(String tag, final String token, final String shopid,
+                                   Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_user_apply_check", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+    //本店会员等级的设置
+    public static void queryVipLevel(String tag, final String token, final String shopid,
+                                     Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_vipuser_level", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", "1"); // 查询
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+
+    public static void addVipLevel(String tag, final String token, final String shopid,final int orderno, final String name, final String intro, final String cost,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_vipuser_level", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", "2"); // 新增
+                params.put("orderno", orderno + "");
+                params.put("name", name);
+                params.put("intro", intro);
+                params.put("cost", cost);
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+    public static void updateVipLevel(String tag, final String token, final String shopid,final String id, final String name, final String intro, final String cost,
+                                   Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_vipuser_level", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", "3"); // 修改
+                params.put("id", id);
+                params.put("name", name);
+                params.put("intro", intro);
+                params.put("cost", cost);
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+    //本店会员优惠项添加
+    public static void addAndModifyPreference(String tag, final String token, final String shopid,final String type, final String name, final String costtype, final String min, final String commission, final String score, final String cost, final String id, final String gift,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_vipuser_cost_list", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", type); //2:新增优惠项; 3:修改优惠项
+                params.put("name", name);
+                params.put("id", id);
+                params.put("costtype", costtype);
+                params.put("min", min);
+                params.put("commission", commission);
+                params.put("score", score);
+                params.put("cost", cost);
+                params.put("gift", gift);
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+
+    //获取现有优惠项
+    public static void getPreference(String tag, final String token, final String shopid,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_vipuser_cost_list", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", "1"); //查询现有优惠项
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    //删除优惠项
+    public static void deletePreference(String tag, final String token, final String shopid,final String id,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_vipuser_cost_list", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", "4"); //删除
+                params.put("id", id);
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    //获取所有会员信息
+    public static void getAllMember(String tag, final String token, final String shopid,final int from, final int size,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_vipuser_manage", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", "1");
+                params.put("from", from + "");
+                params.put("size", size + "");
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    public static void modifyMemberLevel(String tag, final String token, final String shopid,final String id, final String level, final String bill,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_vipuser_manage", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", "2");
+                params.put("id", id);
+                params.put("level", level);
+                params.put("bill", bill);
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    // 店铺会员充值接口
+    public static void rechargeMember(String tag, final String token, final String shopid, final String qrcode, final String userid, final String money, final String extcode,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_user_recharge", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", "3"); // 1:查询会员信息（扫码）2: 会员扫码充值 3:直接充值
+                params.put("qrcode", qrcode);
+                params.put("userid", userid);
+                params.put("money", money);
+                params.put("extcode", extcode);
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        strReq.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    //新增配送费
+    public static void getExtraCost(String tag, final String token, final String shopid,
+                                    Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        doExtraCost(tag, token, shopid,"1", "", "", "", listener, errorListener);
+    }
+
+    public static void addExtraCost(String tag, final String token, final String shopid,String min, String cost,
+                                    Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        doExtraCost(tag, token, shopid,"2", min, cost, "", listener, errorListener);
+    }
+
+    public static void updateExtraCost(String tag, final String token, final String shopid,String id, String min, String cost,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        doExtraCost(tag, token, shopid,"3", min, cost, id, listener, errorListener);
+    }
+
+    public static void deleteExtraCost(String tag, final String token, final String shopid,String id,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        doExtraCost(tag, token, shopid, "4", "", "", id, listener, errorListener);
+    }
+
+    // 配送费增删改查
+    public static void doExtraCost(String tag, final String token, final String shopid, final String type, final String min, final String cost, final String id,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_distribution", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", type);
+                params.put("min", min);
+                params.put("cost", cost);
+                params.put("id", id);
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+    //店铺消息推送•优惠、广告信息接口
+    public static void pushAd(String tag, final String token, final String shopid,final String title, final String content, final String begintime, final String endtime,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_ad", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", "1");
+                params.put("title", title);
+                params.put("content", content);
+                params.put("begintime", begintime);
+                params.put("endtime", endtime);
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    //获取已推送的广告
+
+    public static void getPushAd(String tag, final String token, final String shopid,final int from, final int size, final String ing,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_ad", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", "2");
+                params.put("from", from + ""); //分页启示，默认为0
+                params.put("size", size + "");  //分页每页数据量，默认为10
+                params.put("ing", ing);//是否筛选正在进行中的优惠活动，是传1，不是则不用传输出参数：
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
 
 }

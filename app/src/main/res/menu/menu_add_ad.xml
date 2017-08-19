@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".MainActivity" >
+
+    <item
+        android:id="@+id/add"
+        android:orderInCategory="1"
+        android:icon="@drawable/add_icon_vip_level"
+        app:showAsAction="always"
+        android:title="新建"/>
+
+
+    <item
+        android:id="@+id/all"
+        android:orderInCategory="2"
+        android:icon="@drawable/add_icon_vip_level"
+        app:showAsAction="never"
+        android:title="所有"/>
+
+    <item
+        android:id="@+id/duringtime"
+        android:orderInCategory="3"
+        android:icon="@drawable/add_icon_vip_level"
+        app:showAsAction="never"
+        android:title="进行中"/>
+</menu>

@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ronda.saleassist.R;
+import com.ronda.saleassist.activity.member.ManageVipActivity;
 import com.ronda.saleassist.zznew.guazhang.GuaZhangListActivity;
 import com.ronda.saleassist.api.UserApi;
 import com.ronda.saleassist.base.AppConst;
@@ -186,6 +187,9 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
                 break;
             case R.id.ll_guazhang_manage:
                 jump(GuaZhangListActivity.class);
+                break;
+            case R.id.ll_member_manage:
+                jump(ManageVipActivity.class);
                 break;
 //            case R.id.ll_stock_manage:
 //                jump(StockManageActivity.class);

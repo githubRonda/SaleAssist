@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/round_rect_white"
+        android:orientation="vertical">
+
+        <!--标题-->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dip">
+
+            <TextView
+                android:id="@+id/txt_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="新建配送费"
+                android:textColor="@color/red"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider" />
+
+        <!--内容区-->
+        <LinearLayout
+            android:layout_width="370dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dip">
+
+            <LinearLayout
+                android:id="@+id/ll_preference1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="消费满"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/edit_extra_min"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_div_bg"
+                    android:gravity="center"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:inputType="numberDecimal"
+                    android:textColor="@color/red"
+                    android:textSize="20sp"
+                    tools:text="100" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="元，配送费为"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:id="@+id/textView2"/>
+
+                <EditText
+                    android:id="@+id/edit_extra_cost"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_div_bg"
+                    android:gravity="center"
+                    android:inputType="numberDecimal"
+                    android:textColor="@color/red"
+                    android:textSize="20sp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    tools:text="20" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="元"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:id="@+id/textView3"/>
+
+            </LinearLayout>
+
+
+
+            <!--数字键盘-->
+            <!--<include layout="@layout/include_digit_keyboard_less" />-->
+            <com.ronda.saleassist.view.DigitKeyboardView
+                android:id="@+id/ll_keyboard"
+                android:layout_width="320dp"
+                android:layout_height="wrap_content"
+                ></com.ronda.saleassist.view.DigitKeyboardView>
+        </LinearLayout>
+
+        <!--底部确定和取消按钮-->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dip"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="fill_parent"
+                android:layout_height="35dip"
+                android:layout_marginLeft="10dip"
+                android:layout_marginRight="5dip"
+                android:layout_weight="1"
+                android:background="@drawable/selecter_button"
+                android:text="取消"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_confirm"
+                android:layout_width="fill_parent"
+                android:layout_height="35dip"
+                android:layout_marginLeft="5dip"
+                android:layout_marginRight="10dip"
+                android:layout_weight="1"
+                android:background="@drawable/selecter_button"
+                android:text="确定"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
