@@ -7,6 +7,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,9 @@ import com.ronda.saleassist.bean.CodeEvent;
 import com.ronda.saleassist.engine.BarcodeScannerResolver;
 import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.printer.USBPrinter;
+import com.ronda.saleassist.serialport.CmdSerialPort;
+import com.ronda.saleassist.serialport.WeightSerialPort;
+import com.ronda.saleassist.utils.HexStrUtil;
 import com.ronda.saleassist.utils.MusicUtil;
 import com.ronda.saleassist.utils.ToastUtils;
 import com.socks.library.KLog;
@@ -42,16 +46,19 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
     @BindView(R.id.nav_view)
     NavigationView mNavView;
     @BindView(R.id.drawer_layout)
-    DrawerLayout   mDrawerLayout;
+    DrawerLayout mDrawerLayout;
 
-    private String token  = SPUtils.getString(AppConst.TOKEN, "");
+    private String token = SPUtils.getString(AppConst.TOKEN, "");
     private String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
 
     private ActionBarDrawerToggle mDrawerToggle;
 
     private BarcodeScannerResolver mBarcodeScannerResolver; //扫码解析器
 
-
+    private WeightSerialPort mWeightSerialPort;
+    private String weightComm;
+    private String cmdComm;
+    public CmdSerialPort mCmdSerialPort;
 
 
     @Override
@@ -62,9 +69,31 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
 
         initEvent();
 
+        //初始化usb扫码枪监听
         startScanListen();
 
+        //初始化USB打印
         USBPrinter.getInstance().initPrinter(this);
+
+        //初始化获取重量的串口
+        initReadWeightSerial();
+
+        //初始化指令交互的串口（上行(按键), 下行(数码管显示)）
+        initCmdSerial();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //若串口改变了，则重新初始化
+        if (!SPUtils.getString(AppConst.WEIGHT_SERIAL_PORT, "").equals(weightComm)) {
+            initReadWeightSerial();
+        }
+
+        if (!SPUtils.getString(AppConst.CMD_SERIAL_PORT, "").equals(cmdComm)) {
+            initCmdSerial();
+        }
     }
 
     @Override
@@ -81,6 +110,14 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
         removeScanListen();
 
         USBPrinter.getInstance().destroyPrinter();
+
+        if (mWeightSerialPort != null) {
+            mWeightSerialPort.closeSerial();
+        }
+
+        if (mCmdSerialPort != null) {
+            mCmdSerialPort.closeSerial();
+        }
     }
 
     private void initEvent() {
@@ -179,6 +216,65 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
 
 
     /**
+     * 初始化重量读取串口
+     */
+    private void initReadWeightSerial() {
+        weightComm = SPUtils.getString(AppConst.WEIGHT_SERIAL_PORT, "");
+
+
+        if (TextUtils.isEmpty(weightComm)) {
+            ToastUtils.showToast("未设置重量的串口");
+            return;
+        }
+        if (!weightComm.toLowerCase().startsWith("/dev/ttys")) {
+            ToastUtils.showToast("重量串口设置有误");
+            return;
+        }
+        mWeightSerialPort = new WeightSerialPort(weightComm);
+
+        if (!mWeightSerialPort.isActive()) {
+            ToastUtils.showToast("重量串口不能使用");
+            return;
+        }
+    }
+
+    /**
+     * 初始化指令交互串口
+     */
+    private void initCmdSerial() {
+        cmdComm = SPUtils.getString(AppConst.CMD_SERIAL_PORT, "");
+
+        if (TextUtils.isEmpty(cmdComm)) {
+            ToastUtils.showToast("未设置指令的串口");
+            return;
+        }
+        if (!cmdComm.toLowerCase().startsWith("/dev/ttys")) {
+            ToastUtils.showToast("指令串口设置有误");
+            return;
+        }
+        mCmdSerialPort = new CmdSerialPort(cmdComm);
+
+        if (!mCmdSerialPort.isActive()) {
+            ToastUtils.showToast("指令串口不能使用");
+            return;
+        }
+    }
+
+    /**
+     * 下行指令（重量，单价，累计，总价）
+     * @param hexStr
+     */
+    public void writeCmd(String hexStr){
+        if (mCmdSerialPort==null||!mCmdSerialPort.isActive()){
+            ToastUtils.showToast("未设置指令串口，或串口设置有误");
+            return;
+        }
+
+        mCmdSerialPort.write(HexStrUtil.hexStringToByte(hexStr));
+    }
+
+
+    /**
      * 开始扫码监听
      */
     public void startScanListen() {
@@ -201,7 +297,7 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
                 }
 
                 // TODO: 2017/8/17/0017 支付码 ，但是会员码也是18位，要区分一下
-                if (barcode.length() == 18){
+                if (barcode.length() == 18) {
                     EventBus.getDefault().post(new CodeEvent(barcode));
                 }
 
@@ -243,7 +339,6 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
             finish();
         }
     }
-
 
 
     //========================后台服务器相关=====================================

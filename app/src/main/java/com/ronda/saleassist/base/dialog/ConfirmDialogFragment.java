@@ -5,9 +5,12 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 
 import com.ronda.saleassist.base.BaseDialogFragment;
 
@@ -32,7 +35,7 @@ import com.ronda.saleassist.base.BaseDialogFragment;
  * -- 3) Manifest中为宿主Activity配置旋转后不销毁Activity：android:configChanges="orientation|keyboardHidden|keyboard|screenLayout|screenSize" （布局不变时，用这种方法比较简单）
  * -- 4) Manifest中为宿主Activity配置禁止旋转Activity：android:screenOrientation="portrait"
  */
-public class ConfirmDialogFragment extends BaseDialogFragment {
+public class ConfirmDialogFragment extends DialogFragment {
 
     private static final String EXTRA_DIALOG_TITLE_KEY     = "extra_dialog_title_key";
     private static final String EXTRA_DIALOG_MESSAGE_KEY   = "extra_dialog_message_key";
@@ -72,14 +75,6 @@ public class ConfirmDialogFragment extends BaseDialogFragment {
 
     }
 
-
-    @Override
-    public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void init(View view) {}
 
     @NonNull
     @Override

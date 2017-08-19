@@ -24,8 +24,8 @@ import java.util.Arrays;
 public class CmdSerialPort {
 
 
-    private SerialPort   mSerialPort;
-    private InputStream  mInputStream;
+    private SerialPort mSerialPort;
+    private InputStream mInputStream;
     private OutputStream mOutputStream;
 
     private ReadThread mReadThread;
@@ -100,8 +100,8 @@ public class CmdSerialPort {
 
     class ReadThread extends Thread {
 
-        private StringBuilder sb  = new StringBuilder();
-        private byte[]        buf = new byte[1024];
+        private StringBuilder sb = new StringBuilder();
+        private byte[] buf = new byte[1024];
 
         DecimalFormat format = new DecimalFormat("#0.000");
 
@@ -118,51 +118,89 @@ public class CmdSerialPort {
                     if (len != -1) {
                         byte[] buf_data = Arrays.copyOf(buf, len);
                         String temp = CommonUtil.bytesToHexString(buf_data);
-
                         Log.d("zhiling", "指令数据: " + temp);
-//                        sb.append(new String(buf, 0, len));
-//                        Log.i("TAG", sb.toString());
-//                        if ((startIndex = sb.indexOf(" ")) != -1 && (endIndex = sb.indexOf(" ", startIndex + 1)) != -1) {
-//                            String weight = sb.substring(startIndex + 1, endIndex);
-//                            double weight_d = Double.parseDouble(weight);
-//                            String str = format.format(weight_d);
-//
-//                            KLog.d("str: " + str);
-//                            EventBus.getDefault().post(new WeightEvent(str));
-//                            sb.setLength(0);
-//                        }
-//
-//                        // TODO: 2017/8/8/0008  你可在这里在对sb做过长清空处理
-//                        if (sb.length()>20){
-//                            sb.setLength(0);
-//                        }
 
+                        sb.append(new String(buf, 0, len));
 
-//                        if ((startIndex = sb.indexOf("=")) != -1 && (endIndex = sb.indexOf("=", startIndex + 1)) != -1) {
-//                            // 两个等号之间有13位
-//                            if ((endIndex - startIndex) < 9) { // 说明是错误数据
-//                                sb.setLength(0);
-//                            } else {
-//                                String data = sb.substring(startIndex + 1, endIndex); // 第一位是等号
-//                                String weight = new StringBuilder(data.substring(0, 7)).reverse().toString();
-//                                double weight_d = Double.parseDouble(weight);// 去掉两端的0字符
-//
-//                                //weightStr = ((int) (weight_d * 1000)) + ""; // 去掉小数点，转成int。用于兼容之前版本（用蓝牙获取的是整型）
-//
-//                                String str = format.format(weight_d); // 保留3位小数。用于实时显示重量数据
-//
-//                                //KLog.w("str = " + str);
-//                                EventBus.getDefault().post(new WeightEvent(str));
-////                            mHandler.obtainMessage(0, str).sendToTarget();
-//                                //EventBus.getDefault().post(new WeightEvent()); // 不用EventBus或广播的原因就是我担心频繁的创建对象会消耗大量的资源
-//                                sb.setLength(0);
-//                            }
-//                        }
+                        //0xFA,0xFA,0x01,0xEA,0xEA
+                        if ((startIndex = sb.indexOf("FAFA")) != -1 && (endIndex = sb.indexOf("EAEA", startIndex + 1)) != -1) {
+
+                            String receivedCmd = sb.substring(startIndex, endIndex + 4);
+                            sb.delete(startIndex, endIndex + 4);
+
+                            if (receivedCmd.length() == 10) {
+                                int data = Integer.parseInt(receivedCmd.substring(4, 6));
+
+                                //玛德~~， 这个指令判断真蛋疼， 小白也是的，定义之初就不能定义好一点吗
+                                switch (data) {
+                                    case 1: //累清
+
+                                        break;
+                                    case 2: //取消
+
+                                        break;
+                                    case 3://时间
+
+                                        break;
+                                    case 4://补单
+
+                                        break;
+                                    case 5://折扣
+
+                                        break;
+                                    case 6://7
+
+                                        break;
+                                    case 7://8
+
+                                        break;
+                                    case 8://9
+
+                                        break;
+                                    case 9://取消
+
+                                        break;
+                                    case 10://4
+
+                                        break;
+                                    case 11://5
+
+                                        break;
+                                    case 12://6
+
+                                        break;
+                                    case 13://确定
+
+                                        break;
+                                    case 14://1
+
+                                        break;
+                                    case 15://2
+
+                                        break;
+                                    case 16://3
+
+                                        break;
+                                    case 17://代码
+
+                                        break;
+                                    case 18://0
+
+                                        break;
+                                    case 19://00
+
+                                        break;
+                                    case 20://.
+
+                                        break;
+
+                                }
+                            }
+                            //sb.setLength(0);
+                        }
                     }
-                    Thread.sleep(200);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
+                    //Thread.sleep(200);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

@@ -49,14 +49,27 @@ mobile + password + confirmPassword + nickname + code
 
 * 硬件相关功能
     * USB扫码 --> 绑定到MainActivity，一直执行，当监听到条码时，自动获取对应货物，添加至货篮
+    * 重量使用串口S2
+    * 键盘使用串口S0
+    * 数码管也要使用串口
 
 * 浮窗
     * 参考群图片
     * 注意：总计的显示--> 先显示小计，过一会就显示总计
 
+* 支付宝支付:
+1. 获取条码 + 其他参数 --> 提交给后台
 
+显示正在扫码对话框 --> （获取到条码之后就立即把条码以及其他相关参数提交至后台） --> 对话框显示正在支付
+    |--> 支付成功： 会话框变成勾， 3s后自动消失或手动点击确定
+    |--> 支付失败： 对话框变成×， 3s后自动消失或手动点击确定 （ 或者 点击再次扫码 ）
 
-* 支付
+会员码(挂账)，微信码，支付宝码 都是18位
+要用一个变量存储当前的条码类型 code_type
+
+串口读取，获取支付方式
+
+* 支付体系
     * 所有的支付方式都通过 EventBus.getDefault().post(new PayEvent(PAY_LATER, "挂账支付 ")); 这种形式 统一交给 onEventDispatchPayMethod(final PayEvent payEvent) 来分发
     * 现金支付： 直接在 onEventDispatchPayMethod() 中调用 uploadOrder()
     * 支付宝：在 onEventDispatchPayMethod() 中，设置当 mCurCodeType 为 支付宝 类型，并且显示 PayProcessDialog.
@@ -73,9 +86,15 @@ mobile + password + confirmPassword + nickname + code
 3. 这里没有实现 会员支付时若余额不足，继续使用现金、支付宝、微信支付 功能
 
 
+
+
+
 待解决
 修改货物两个折扣，不能使用LSpinner, 要改为 EditText属性的View
 当是总额逢1进或逢5进的时候，CartBean#getDiscountCost() 到底要不要只保留两位小数，多的直接舍去
+
+数码管也要使用串口
+
 
 指令
 
@@ -87,17 +106,9 @@ mobile + password + confirmPassword + nickname + code
 
 
 
-支付宝支付:
-1. 获取条码 + 其他参数 --> 提交给后台
 
-显示正在扫码对话框 --> （获取到条码之后就立即把条码以及其他相关参数提交至后台） --> 对话框显示正在支付
-    |--> 支付成功： 会话框变成勾， 3s后自动消失或手动点击确定
-    |--> 支付失败： 对话框变成×， 3s后自动消失或手动点击确定 （ 或者 点击再次扫码 ）
 
-会员码(挂账)，微信码，支付宝码 都是18位
-要用一个变量存储当前的条码类型 code_type
 
-串口读取，获取支付方式
 
 
 AlertDialog 和 windowManager.addView() 不能共存， windowManager的层级更高。若先 windowManager.addView() 则 AlertDialog.show() 不会显示出来

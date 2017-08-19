@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ import com.ronda.saleassist.base.BaseDialogFragment;
 /**
  * 自定义进度dialog
  */
-public class ProgressDialogFragment extends BaseDialogFragment {
+public class ProgressDialogFragment extends DialogFragment {
 
     private String  mMessage;
     private boolean mIsCancelable;
@@ -52,15 +53,6 @@ public class ProgressDialogFragment extends BaseDialogFragment {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    @Override
-    public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void init(View view) {
-
-    }
 
     public static ProgressDialogFragment newInstance(String message, boolean cancelable) {
         ProgressDialogFragment dialog = new ProgressDialogFragment();

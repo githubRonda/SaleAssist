@@ -25,6 +25,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ronda.saleassist.R;
+import com.ronda.saleassist.activity.MainActivity;
 import com.ronda.saleassist.adapter.divider.DividerItemDecoration;
 import com.ronda.saleassist.api.UserApi;
 import com.ronda.saleassist.api.volley.GsonUtil;
@@ -46,6 +47,7 @@ import com.ronda.saleassist.local.sqlite.table.CartBeanOrder;
 import com.ronda.saleassist.local.sqlite.table.CartBeanOrderDao;
 import com.ronda.saleassist.printer.PrintUtils;
 import com.ronda.saleassist.printer.USBPrinter;
+import com.ronda.saleassist.serialport.CmdSerialPort;
 import com.ronda.saleassist.utils.MathCompute;
 import com.ronda.saleassist.utils.MusicUtil;
 import com.ronda.saleassist.utils.ToastUtils;
@@ -60,6 +62,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -323,6 +326,7 @@ public class CartFragment extends BaseFragment {
         }
     }
 
+    private DecimalFormat format = new DecimalFormat("000000");
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventGetWeight(final WeightEvent weightEvent) {
@@ -341,6 +345,12 @@ public class CartFragment extends BaseFragment {
         } catch (Exception e) {
             hideLeftView();
         }
+
+        //下行重量
+        int weight_g = (int) (Double.parseDouble(weight) * 1000); // 单位g, 整数
+        String result = this.format.format(weight_g);
+        ((MainActivity) getActivity()).writeCmd("FAFA" + result + "FBFB");
+
         //KLog.i("MainActivity: weightEvent --> " + weightEvent.getWeight());
     }
 
@@ -394,6 +404,41 @@ public class CartFragment extends BaseFragment {
         // 更新总计
         mTxtTotal.setText(getCurTotalCost());
 
+        downCmdPrice();
+    }
+
+    /**
+     * 下行价格，总计，累计指令
+     */
+    private void downCmdPrice() {
+        CmdSerialPort cmdSerialPort = ((MainActivity) getActivity()).mCmdSerialPort;
+
+        if (cmdSerialPort==null||!cmdSerialPort.isActive()){
+            ToastUtils.showToast("未设置指令串口，或串口设置有误");
+            return;
+        }
+
+        int price_int = 0; // 单位分, 整数
+        int subtotal_int = 0; // 单位分, 整数
+        int total_int = (int) (Double.parseDouble(getCurTotalCost()) * 100); // 单位分, 整数
+
+        if (mCartAdapter.getData().size() != 0){
+            //下行单价
+            price_int = (int) (Double.parseDouble(mCartAdapter.getData().get(0).getDiscountPrice()) * 100); // 单位分, 整数
+            subtotal_int = (int) (Double.parseDouble(mCartAdapter.getData().get(0).getDiscountCost()) * 100); // 单位分, 整数
+        }
+
+        //下行单价
+        String result = this.format.format(price_int);
+        ((MainActivity) getActivity()).writeCmd("EBEB" + result + "ECEC");
+
+        //下行累计总价
+        String result1 = this.format.format(total_int);
+        ((MainActivity) getActivity()).writeCmd("CDCD" + result1 + "CECE");
+
+        //下行小计
+        String result2 = this.format.format(subtotal_int);
+        ((MainActivity) getActivity()).writeCmd("BEBE" + result2 + "BFBF");
     }
 
     /**
@@ -403,7 +448,7 @@ public class CartFragment extends BaseFragment {
      */
     public String getCurTotalCost() {
 
-        String total;
+        String total="0";
 
         BigDecimal b = new BigDecimal("0.0");
         for (CartBean bean : mCartAdapter.getData()) {
@@ -536,7 +581,6 @@ public class CartFragment extends BaseFragment {
      * 取单 按钮调用
      */
     public void getOrder() {
-
         if (!mCartAdapter.getData().isEmpty()) {//货篮中有数据时
             mDialogFactory.showConfirmDialog("提示", "当前有销售数据可能没有保存，是否放弃当前数据并取单？", false, 2, new DialogFactory.DialogActionListener() {
                 @Override

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ import com.ronda.saleassist.base.BaseDialogFragment;
 /**
  * 列表dialog
  */
-public class ListDialogFragment extends BaseDialogFragment {
+public class ListDialogFragment extends DialogFragment {
 
     private   String[] mItemContents;
     protected boolean  mIsCancelable;
@@ -41,6 +42,7 @@ public class ListDialogFragment extends BaseDialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setItems(mItemContents, new DialogInterface.OnClickListener() {
@@ -55,19 +57,6 @@ public class ListDialogFragment extends BaseDialogFragment {
         setCancelable(mIsCancelable);
 
         return builder.create();
-    }
-
-
-    //纯粹向父类中的onCreateView()中添加取消标题栏的代码
-    @Override
-    public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void init(View view) {
-
     }
 
 

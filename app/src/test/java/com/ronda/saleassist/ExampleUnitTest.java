@@ -2,6 +2,8 @@ package com.ronda.saleassist;
 
 import org.junit.Test;
 
+import java.text.DecimalFormat;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -17,6 +19,10 @@ public class ExampleUnitTest {
 
     @Test
     public void testJson() throws Exception {
+
+        DecimalFormat format = new DecimalFormat("000000");
+        String result = format.format(1000);
+        System.out.println(result);
 
 
     }

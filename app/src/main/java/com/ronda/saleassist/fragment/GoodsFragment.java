@@ -59,10 +59,7 @@ import com.ronda.saleassist.bean.GoodsStyle;
 import com.ronda.saleassist.bean.SubCategory;
 import com.ronda.saleassist.bean.WeightEvent;
 import com.ronda.saleassist.dialog.GoodsStyleDialog;
-import com.ronda.saleassist.engine.BarcodeScannerResolver;
 import com.ronda.saleassist.local.preference.SPUtils;
-import com.ronda.saleassist.serialport.CmdSerialPort;
-import com.ronda.saleassist.serialport.WeightSerialPort;
 import com.ronda.saleassist.utils.Base64Encoder;
 import com.ronda.saleassist.utils.ToastUtils;
 import com.ronda.saleassist.view.LSpinner;
@@ -80,8 +77,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -97,33 +92,26 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 
 
     @BindView(R.id.btn_edit_order)
-    Button             mBtnEditOrder;
+    Button mBtnEditOrder;
     @BindView(R.id.btn_refresh)
-    Button             mBtnRefresh;
+    Button mBtnRefresh;
     @BindView(R.id.img_arrow_left)
-    ImageButton        mImgArrowLeft;
+    ImageButton mImgArrowLeft;
     @BindView(R.id.rv_category)
-    RecyclerView       mRvCategory;
+    RecyclerView mRvCategory;
     @BindView(R.id.recycler_view)
-    RecyclerView       mRecyclerView;
+    RecyclerView mRecyclerView;
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.btn_scan_down)
-    Button             mBtnScanDown;
+    Button mBtnScanDown;
     @BindView(R.id.fragment_category)
-    LinearLayout       mFragmentCategory;
+    LinearLayout mFragmentCategory;
 
-    private static final int CODE_GOODS            = 0x10;
-    private static final int CODE_MEMBER_DELAY_PAY = 0x20; //表示会员码，用于挂账
-    private static final int CODE_MEMBER_PAY       = 0x21; // 表示会员码，用于会员支付
-    private static final int CODE_ALI_PAY          = 0x30;
-    private static final int CODE_WECHAT_PAY       = 0x40;
-
-
-    private static final int SELECT_PICTURE    = 0; // 相册选择图片请求
+    private static final int SELECT_PICTURE = 0; // 相册选择图片请求
     private static final int CROP_REQUEST_CODE = 1; //裁剪图片请求
 
-    private String token  = SPUtils.getString(AppConst.TOKEN, "");
+    private String token = SPUtils.getString(AppConst.TOKEN, "");
     private String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
 
     private static final int ONE_SCREEN_SIZE = 36; // 表示一屏的数据。要比pageSize要小
@@ -131,10 +119,10 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     public static int SELECT_POSITION = 0; //选中的分类项
 
     private int pageCount = 0; //分页加载的页码，当前页。（加载下一页成功后，会加1）。后台是从1开始。因为前台一开始是没有数据，所以初始化为0，当第一页数据加载成功之后，才为1
-    private int pageSize  = 40; //每页的大小
+    private int pageSize = 40; //每页的大小
 
     private CategoryAdapter mCategoryAdapter;
-    private GoodsAdapter    mGoodsAdapter;
+    private GoodsAdapter mGoodsAdapter;
 
     private ImageView img_pic; //修改货物对话框中的View，提取出来的原因就是因为在裁剪图片的回调方法中要设置
 
@@ -145,22 +133,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     private ItemTouchHelper mItemTouchHelper;
 
 
-    private Timer     timer;
-    private TimerTask task;
-
-    // handler 处理支付码和货物码
-//    private CodeHandler handler = new CodeHandler();//用于处理各种条码的处理器
-
-    private static String payQrcode;
-    private static String goodsCode;
-    private static String memberCode;
-
-    private BarcodeScannerResolver mBarcodeScannerResolver; //扫码监听
-    private WeightSerialPort       mWeightSerialPort;
-    private String                 weightComm;
-    private String                 cmdComm;
-    private CmdSerialPort          mCmdSerialPort;
-    private WeightEvent            mWeightEvent;// 串口发送过来的重量,
+    private WeightEvent mWeightEvent;// 串口发送过来的重量,
 
     @Override
     public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -180,24 +153,11 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         initGoodsEvent();
 
         initDragGoodsEvent();
-
-        initReadWeightSerial();
-
-        initCmdSerial();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        //若串口改变了，则重新初始化
-        if (!SPUtils.getString(AppConst.WEIGHT_SERIAL_PORT, "").equals(weightComm)) {
-            initReadWeightSerial();
-        }
-
-        if (!SPUtils.getString(AppConst.CMD_SERIAL_PORT, "").equals(cmdComm)) {
-            initCmdSerial();
-        }
     }
 
     @Override
@@ -205,19 +165,12 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         super.onDestroy();
         VolleyUtil.getInstance().cancelPendingRequests(TAG);
 
-        if (mWeightSerialPort != null) {
-            mWeightSerialPort.closeSerial();
-        }
-
         EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEventMainThread(WeightEvent weightEvent) {
         this.mWeightEvent = weightEvent;
-
-//        KLog.i("GoodsFragment: weightEvent --> "+ weightEvent.getWeight());
-
     }
 
     private void initCategoryView() {
@@ -316,7 +269,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
                 // TODO: 2017/8/12/0012 这里省略掉确认对话框
                 SubCategory goods = mGoodsAdapter.getData().get(position);
 
-                String weight="0.000";
+                String weight = "0.000";
                 if ("1".equals(goods.getMethod())) { //计件类 ： 不需要获取秤端重量
                     weight = "1";
                 } else { //称重类， 需要货物秤端的重量
@@ -324,8 +277,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 //                    mWeightEvent = new DecimalFormat("0.00").format(Math.random() * 10); // 模拟一个随机值
                     if (mWeightEvent != null) {
                         weight = mWeightEvent.getWeight();
-                    }
-                    else{
+                    } else {
                         // TODO: 2017/8/15/0015
                         weight = new DecimalFormat("0.00").format(Math.random() * 10);// 模拟一个随机值
                         //ToastUtils.showToast("未获取到重量数据");
@@ -355,46 +307,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
                 return true;
             }
         });
-    }
-
-    private void initReadWeightSerial() {
-        weightComm = SPUtils.getString(AppConst.WEIGHT_SERIAL_PORT, "");
-
-
-        if (TextUtils.isEmpty(weightComm)) {
-            Toast.makeText(getActivity(), "未设置重量的串口", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (!weightComm.toLowerCase().startsWith("/dev/ttys")) {
-            Toast.makeText(getActivity(), "重量串口设置有误！", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        mWeightSerialPort = new WeightSerialPort(weightComm);
-
-        if (!mWeightSerialPort.isActive()) {
-            Toast.makeText(getActivity(), "重量串口不能使用", Toast.LENGTH_SHORT).show();
-            return;
-        }
-    }
-
-    private void initCmdSerial() {
-        cmdComm = SPUtils.getString(AppConst.CMD_SERIAL_PORT, "");
-
-
-        if (TextUtils.isEmpty(cmdComm)) {
-            Toast.makeText(getActivity(), "未设置指令的串口", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (!cmdComm.toLowerCase().startsWith("/dev/ttys")) {
-            Toast.makeText(getActivity(), "指令串口设置有误！", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        mCmdSerialPort = new CmdSerialPort(cmdComm);
-
-        if (!mCmdSerialPort.isActive()) {
-            Toast.makeText(getActivity(), "指令串口不能使用", Toast.LENGTH_SHORT).show();
-            return;
-        }
     }
 
 
@@ -1429,129 +1341,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     }
 
 
-    /**
-     * 不间断的检测 mBluetooth 中的静态变量 payQrcode goodsCode memberCode 是否为空，不为空的话，取出其内容，且重置为空
-     * <p>
-     * //@param codeType 标识当前检测的条码时是支付码，还是货物码，或者会员码（当codeType是会员码时，用于标识该会员码用于支付还是挂账）
-     */
-//    public void startTimer(final int codeType) {
-//        payQrcode = null;//先置空这个变量
-//        goodsCode = null;//先置空。
-//        memberCode = null;
-//
-//        timer = new Timer();
-//        switch (codeType) {
-//            case CODE_GOODS:  //货物码
-//                startScanListen();
-//                task = new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        if (!TextUtils.isEmpty(goodsCode)) {
-//                            Message msg = new Message();
-//                            msg.what = CODE_GOODS; // 表示货物条码
-//                            msg.obj = new String(goodsCode);
-//
-//                            KLog.i("检测到商品条码：" + msg.obj);
-//
-//                            handler.sendMessage(msg);
-//                            goodsCode = null;
-//                        }
-//                    }
-//                };
-//                break;
-//
-//            case CODE_MEMBER_DELAY_PAY:
-//            case CODE_MEMBER_PAY:
-//                task = new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        if (mBluetooth.memberCode != null && !mBluetooth.memberCode.isEmpty()) {
-//                            stopTimer();
-//                            Message msg = new Message();
-//                            msg.what = codeType; // 表示会员条码,用于挂账和会员支付
-//                            msg.obj = new String(mBluetooth.memberCode);
-//
-//                            KLog.i("检测到会员码数据：" + msg.obj);
-//
-//                            handler.sendMessage(msg);
-//
-//                            mBluetooth.memberCode = null;
-//                        }
-//                    }
-//                };
-//
-//                break;
-//
-//            case CODE_ALI_PAY:
-//                task = new TimerTask() {
-//                    @Override
-//                    public void run() {//获取支付宝支付码
-//                        if (mBluetooth.payQrcode != null && !mBluetooth.payQrcode.isEmpty()) {
-//                            stopTimer();
-//                            Message msg = new Message();
-//                            msg.what = CODE_ALI_PAY; //支付宝标志
-//                            msg.obj = mBluetooth.payQrcode;
-//                            handler.sendMessage(msg);
-//                            mBluetooth.payQrcode = null; //重置为null
-//                        }
-//                    }
-//                };
-//                break;
-//            case CODE_WECHAT_PAY:
-//                task = new TimerTask() {
-//                    @Override
-//                    public void run() {//获取微信支付码
-//                        if (mBluetooth.payQrcode != null && !mBluetooth.payQrcode.isEmpty()) {
-//                            stopTimer();
-//                            Message msg = new Message();
-//                            msg.what = CODE_WECHAT_PAY; //微信标志
-//                            msg.obj = mBluetooth.payQrcode;
-//                            handler.sendMessage(msg);
-//                            mBluetooth.payQrcode = null; //重置为null
-//                        }
-//                    }
-//                };
-//                break;
-//        }
-//
-//        timer.schedule(task, 0, 800);//启动定时器，延迟为1s，循环间隔为1s
-//    }
-    public void stopTimer() {
-        if (timer != null) {
-            task.cancel();
-            timer.cancel();
-            task = null;
-            timer = null;
-        }
-    }
-
-    /**
-     * 开始扫码监听
-     */
-    public void startScanListen() {
-        mBarcodeScannerResolver = new BarcodeScannerResolver();
-        mBarcodeScannerResolver.setScanSuccessListener(new BarcodeScannerResolver.OnScanSuccessListener() {
-            @Override
-            public void onScanSuccess(String barcode) {
-                //TODO 显示扫描内容
-                //条码有8位和13位的
-                if (barcode.length() == 8 || barcode.length() == 13) {
-                    Log.w(TAG, "barcode: " + barcode);
-                }
-                ToastUtils.showToast("barcode: " + barcode);
-            }
-        });
-    }
-
-    /**
-     * 移除扫码监听
-     */
-    public void removeScanListen() {
-        mBarcodeScannerResolver.removeScanSuccessListener();
-        mBarcodeScannerResolver = null;
-    }
-
-
     //=================================内部类======================================
 
     /**
@@ -1634,33 +1423,6 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
             holder.setText(R.id.tv_name, item.getName());
             holder.setText(R.id.tv_price, item.getPrice() + item.getUnit());
 
-
-//            holder.setText(R.id.text_subcategory, item.getName() + " " + item.getPrice() + item.getUnit());
-//            Glide.with(mContext)
-//                    .load(UserApi.BASE_SERVER + item.getPicurl())
-//                    .into((ImageView) holder.getView(R.id.img_subcategory));
-
-//            if ("1".equals(item.getMethod())) {
-//                holder.setVisible(R.id.img_num, true);
-//                PaintUtil.paintCircle((ImageView) holder.getView(R.id.img_num));
-//            } else {
-//                holder.setVisible(R.id.img_num, false);
-//            }
-//
-//            String discount = item.getDiscount2().trim();//discount2为公共折扣（要显示在主界面上的）
-//            //判断是否是有效的折扣（不为0，不为1，不为空字符串）
-//            if (discount.equals("0") || discount.equals("1") || discount.isEmpty()) {
-//                holder.setVisible(R.id.img_discount, false);
-//            } else {
-//                holder.setVisible(R.id.img_discount, true); //必须要首先设置显示，要不然item复用是有的会显示不出来
-//
-//                if (Double.parseDouble(discount) > 0 && Double.parseDouble(discount) < 1) {
-//                    String s = String.valueOf(Double.parseDouble(discount)); //先把discount转成double类型再转成String类型，是为了去除小数部分最后一位是0的情况
-//
-//                    PaintUtil.paintText(s.substring(s.indexOf(".") + 1, s.length()) + "折", (ImageView) holder.getView(R.id.img_discount));
-//                }
-//            }
-
             if (item.isMoving()) {
                 holder.setBackgroundRes(R.id.ll_content, R.drawable.bg_item_dash);
             } else {
@@ -1678,92 +1440,4 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
             notifyDataSetChanged();
         }
     }
-
-
-    //用于处理各种条码的处理器
-//    class CodeHandler extends Handler {
-//
-//        // 扫码卖货时，关闭秤端扫码，用于延迟关闭，为handler 服务
-//        Runnable mShutScanRunnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                stopTimer();
-//            }
-//        };
-//
-//        @Override
-//        public void handleMessage(Message msg) {
-//            super.handleMessage(msg);
-//            switch (msg.what) {
-//                case CODE_ALI_PAY: //接收到支付宝条码。这里有两种情况：1.单纯的支付宝付款；2.会员支付余额不足时,接着支付宝支付
-//                    if (payConfirmDialog != null && payConfirmDialog.isShowing()) {
-//                        String paycode = msg.obj.toString();
-//
-//                        if (memberInfo == null) { // 普通的支付宝支付（非会员支付）
-//                            //非会员支付时，customer可为空，这里习惯设为1
-//                            uploadOrder(PAY_ALI, "1", paycode, "", "", "", "");//上传订单 支付宝
-//
-//                        } else {//会员余额不足时， 接着用支付宝支付
-//                            // 获取会员优惠折扣信息
-//                            List<PreferenceBean> list = memberInfo.getCosts();
-//                            String discount = "1";
-//                            for (int i = 0; i < list.size(); i++) {
-//                                if ("3".equals(list.get(i).getCosttype())) { //表示折扣
-//                                    discount = list.get(i).getCost();
-//                                }
-//                            }
-//                            String costTotal = PreciseCompute.mul(getTotal() + "", discount); //原价*会员优惠折扣
-//                            String extpay = PreciseCompute.roundHalfUp_scale2(PreciseCompute.sub(costTotal, memberInfo.getMoney() + "")); //补差价，保留两位小数，四舍五入
-//
-//                            uploadOrder(PAY_VIP, memberInfo.getUserid(), paycode, costTotal, memberInfo.getExtcode(), PAY_ALI, extpay); // 上传订单 会员支付 余额不足 支付宝支付
-//                        }
-//                    }
-//                    break;
-//
-//                case CODE_WECHAT_PAY:
-//                    if (payConfirmDialog != null && payConfirmDialog.isShowing()) {
-//                        String paycode = msg.obj.toString();
-//
-//                        if (memberInfo == null) { // 普通的微信支付（非会员支付）
-//                            //非会员支付时，customer可为空，这里习惯设为1
-//                            uploadOrder(PAY_WECHAT, "1", paycode, "", "", "", "");//上传订单 微信
-//                            Toast.makeText(getActivity(), "weixin_pay:" + paycode, Toast.LENGTH_SHORT).show();
-//                            System.out.println("weixin_pay:" + paycode);
-//                        } else {//会员余额不足时， 接着用微信支付
-//                            // 获取会员优惠折扣信息
-//                            List<PreferenceBean> list = memberInfo.getCosts();
-//                            String discount = "1";
-//                            for (int i = 0; i < list.size(); i++) {
-//                                if ("3".equals(list.get(i).getCosttype())) { //表示折扣
-//                                    discount = list.get(i).getCost();
-//                                }
-//                            }
-//                            String costTotal = PreciseCompute.mul(getTotal() + "", discount); //原价*会员优惠折扣
-//                            String extpay = PreciseCompute.roundHalfUp_scale2(PreciseCompute.sub(costTotal, memberInfo.getMoney() + "")); //补差价，保留两位小数，四舍五入
-//
-//                            uploadOrder(PAY_VIP, memberInfo.getUserid(), paycode, costTotal, memberInfo.getExtcode(), PAY_WECHAT, extpay); // 上传订单 会员支付 余额不足 支付宝支付
-//                        }
-//
-//                    }
-//                    break;
-//                case CODE_GOODS: //接收到货物条码的数据时
-//                    String goodsCode = msg.obj.toString();
-//                    Toast.makeText(MyApplication.getInstance(), "条码值为：" + goodsCode, Toast.LENGTH_SHORT).show();
-//
-//                    ((CategoryFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_category)).getGoodsInfoByCode(goodsCode);
-//
-//                    //延迟6s 关闭定时器。（应该是从最后一次开始计算，然后6s之后才关闭）
-//                    handler.removeCallbacks(mShutScanRunnable);// 先移除 runnable
-//                    handler.postDelayed(mShutScanRunnable, 12000);
-//                    break;
-//                case CODE_MEMBER_DELAY_PAY: // 接收到会员条码的数据时,做挂账处理
-//                case CODE_MEMBER_PAY: // 接收到会员条码的数据时,做挂账处理和会员支付处理
-//                    String memberCode = msg.obj.toString();
-//                    Toast.makeText(MyApplication.getInstance(), "会员条码值为：" + memberCode, Toast.LENGTH_SHORT).show();
-//                    getMemberInfoByCode(memberCode, msg.what);
-//                    break;
-//            }
-//
-//        }
-//    }
 }
