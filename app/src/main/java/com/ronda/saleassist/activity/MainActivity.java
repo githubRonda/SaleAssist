@@ -266,7 +266,7 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
      */
     public void writeCmd(String hexStr){
         if (mCmdSerialPort==null||!mCmdSerialPort.isActive()){
-            ToastUtils.showToast("未设置指令串口，或串口设置有误");
+            //ToastUtils.showToast("未设置指令串口，或串口设置有误");
             return;
         }
 

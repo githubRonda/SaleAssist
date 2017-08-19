@@ -85,7 +85,7 @@ android {
 }
 
 greendao { // 相关配置
-    schemaVersion 2  // schemaVersion 是必须要指定的
+    schemaVersion 3  // schemaVersion 是必须要指定的
     //daoPackage 'com.greendao.gen'
     //targetGenDir 'src/main/java'
 }

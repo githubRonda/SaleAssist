@@ -56,8 +56,10 @@ import com.ronda.saleassist.bean.CategoryBean;
 import com.ronda.saleassist.bean.GoodsBean;
 import com.ronda.saleassist.bean.GoodsOrder;
 import com.ronda.saleassist.bean.GoodsStyle;
+import com.ronda.saleassist.bean.PriceEvent;
 import com.ronda.saleassist.bean.SubCategory;
 import com.ronda.saleassist.bean.WeightEvent;
+import com.ronda.saleassist.dialog.FuzzyQueryGoodsDialog;
 import com.ronda.saleassist.dialog.GoodsStyleDialog;
 import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.utils.Base64Encoder;
@@ -135,6 +137,9 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 
     private WeightEvent mWeightEvent;// 串口发送过来的重量,
 
+
+    private FuzzyQueryGoodsDialog mQuickDialog;
+
     @Override
     public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -153,6 +158,8 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         initGoodsEvent();
 
         initDragGoodsEvent();
+
+        mQuickDialog = FuzzyQueryGoodsDialog.newInstance("quick_dialog");
     }
 
     @Override
@@ -169,9 +176,29 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEventMainThread(WeightEvent weightEvent) {
+    public void onEventGetWeight(WeightEvent weightEvent) {
         this.mWeightEvent = weightEvent;
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventGetPrice(PriceEvent event) {
+
+        if (mQuickDialog == null) {
+            return;
+        }
+
+        //先显示
+        if (!mQuickDialog.isVisible()){
+            mQuickDialog.show(getActivity().getSupportFragmentManager(), "quick_dialog");
+        }
+
+        mQuickDialog.appendText(event.getPrice());
+
+        /*if (mQuickDialog.isVisible()){
+                    mQuickDialog.dismiss();
+                }*/
+    }
+
 
     private void initCategoryView() {
         mRvCategory.setHasFixedSize(true);

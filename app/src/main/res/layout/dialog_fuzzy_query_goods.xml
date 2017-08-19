@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_dialog_round_rect"
+    android:orientation="vertical"
+    >
+
+    <!--顶部-->
+    <include layout="@layout/include_dialog_top"/>
+
+    <!--正文-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:orientation="vertical"
+        android:padding="10dp"
+        >
+
+        <!--输入框和按钮-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            >
+
+            <EditText
+                android:id="@+id/et_fuzzy_query"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:padding="4dp"
+                android:textColor="@color/gray"
+                android:textSize="18sp"
+                android:inputType="numberDecimal"
+                android:layout_marginRight="10dp"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:clickable="false"
+                android:background="@drawable/selector_bg_edit_border"
+                android:hint="价格"
+                />
+
+            <Button
+                android:visibility="gone"
+                android:id="@+id/btn_fuzzy_query"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="查询"
+                />
+
+        </LinearLayout>
+
+        <!--表头-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            >
+
+            <TextView
+                style="@style/ReportTitleStyle"
+                android:text="品名"
+                />
+
+            <TextView
+                style="@style/ReportTitleStyle"
+                android:text="价格"
+                />
+
+        </LinearLayout>
+
+        <!--数据部分-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+            </android.support.v7.widget.RecyclerView>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!--底部按钮-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/sel_dialog_bottom_btn"
+            android:text="取消"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            />
+
+        <Button
+            android:id="@+id/btn_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/sel_dialog_bottom_btn"
+            android:text="选择"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            />
+    </LinearLayout>
+
+</LinearLayout>

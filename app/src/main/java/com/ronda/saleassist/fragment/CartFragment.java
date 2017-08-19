@@ -45,6 +45,8 @@ import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.local.sqlite.GreenDaoHelper;
 import com.ronda.saleassist.local.sqlite.table.CartBeanOrder;
 import com.ronda.saleassist.local.sqlite.table.CartBeanOrderDao;
+import com.ronda.saleassist.local.sqlite.table.SimpleGoodsBean;
+import com.ronda.saleassist.local.sqlite.table.SimpleGoodsBeanDao;
 import com.ronda.saleassist.printer.PrintUtils;
 import com.ronda.saleassist.printer.USBPrinter;
 import com.ronda.saleassist.serialport.CmdSerialPort;
@@ -370,13 +372,13 @@ public class CartFragment extends BaseFragment {
             case R.id.btn_add:
                 //showAddDialog();
 
-                EventBus.getDefault().post(new PayEvent(PAY_LATER, "挂账支付 "));
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        EventBus.getDefault().post(new CodeEvent("123456789012345678"));
-                    }
-                }, 3000);
+//                EventBus.getDefault().post(new PayEvent(PAY_LATER, "挂账支付 "));
+//                mHandler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        EventBus.getDefault().post(new CodeEvent("123456789012345678"));
+//                    }
+//                }, 3000);
                 break;
             case R.id.btn_pay_cash:
                 EventBus.getDefault().post(new PayEvent(PAY_CASH, "现金支付 "));

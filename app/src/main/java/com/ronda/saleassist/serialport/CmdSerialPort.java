@@ -1,7 +1,11 @@
 package com.ronda.saleassist.serialport;
 
+import android.content.Intent;
 import android.util.Log;
 
+import com.ronda.saleassist.base.MyApplication;
+import com.ronda.saleassist.bean.PayEvent;
+import com.ronda.saleassist.bean.PriceEvent;
 import com.ronda.saleassist.bean.WeightEvent;
 import com.ronda.saleassist.utils.CommonUtil;
 import com.socks.library.KLog;
@@ -98,6 +102,8 @@ public class CmdSerialPort {
         }
     }
 
+    private PriceEvent priceEvent = new PriceEvent();
+
     class ReadThread extends Thread {
 
         private StringBuilder sb = new StringBuilder();
@@ -120,12 +126,15 @@ public class CmdSerialPort {
                         String temp = CommonUtil.bytesToHexString(buf_data);
                         Log.d("zhiling", "指令数据: " + temp);
 
-                        sb.append(new String(buf, 0, len));
+                        sb.append(temp);
 
                         //0xFA,0xFA,0x01,0xEA,0xEA
-                        if ((startIndex = sb.indexOf("FAFA")) != -1 && (endIndex = sb.indexOf("EAEA", startIndex + 1)) != -1) {
+                        if ((startIndex = sb.indexOf("fafa")) != -1 && (endIndex = sb.indexOf("eaea", startIndex + 1)) != -1) {
 
                             String receivedCmd = sb.substring(startIndex, endIndex + 4);
+
+                            KLog.d("cmd: " + receivedCmd);
+
                             sb.delete(startIndex, endIndex + 4);
 
                             if (receivedCmd.length() == 10) {
@@ -133,64 +142,59 @@ public class CmdSerialPort {
 
                                 //玛德~~， 这个指令判断真蛋疼， 小白也是的，定义之初就不能定义好一点吗
                                 switch (data) {
-                                    case 1: //累清
+                                    case 1: //折扣
 
                                         break;
-                                    case 2: //取消
+                                    case 2: //7
+                                    case 3://8
+                                    case 4://9
+                                        priceEvent.setPrice((data + 5) + "");
+                                        EventBus.getDefault().post(priceEvent);
+                                        break;
+                                    case 5://钱箱
+                                        Intent intent = new Intent("com.android.yf_pull_money_locker");
+                                        MyApplication.getInstance().sendBroadcast(intent);
+                                        break;
+                                    case 6://数量
 
                                         break;
-                                    case 3://时间
+                                    case 7://4
+                                    case 8://5
+                                    case 9://6
+                                        priceEvent.setPrice((data - 3) + "");
+                                        EventBus.getDefault().post(priceEvent);
+                                        break;
+                                    case 10://结算
+                                        EventBus.getDefault().post(new PayEvent("cash", "现金支付 "));
+                                        break;
+                                    case 11://锁定
 
                                         break;
-                                    case 4://补单
+                                    case 12://1
+                                    case 13://2
+                                    case 14://3
+                                        priceEvent.setPrice((data - 11) + "");
+                                        EventBus.getDefault().post(priceEvent);
+                                        break;
+                                    case 15://找钱
 
                                         break;
-                                    case 5://折扣
+                                    case 16://代码
 
                                         break;
-                                    case 6://7
-
+                                    case 17://0
+                                        priceEvent.setPrice("0");
+                                        EventBus.getDefault().post(priceEvent);
                                         break;
-                                    case 7://8
-
+                                    case 18://00
+                                        priceEvent.setPrice("00");
+                                        EventBus.getDefault().post(priceEvent);
                                         break;
-                                    case 8://9
-
+                                    case 19://.
+                                        priceEvent.setPrice(".");
+                                        EventBus.getDefault().post(priceEvent);
                                         break;
-                                    case 9://取消
-
-                                        break;
-                                    case 10://4
-
-                                        break;
-                                    case 11://5
-
-                                        break;
-                                    case 12://6
-
-                                        break;
-                                    case 13://确定
-
-                                        break;
-                                    case 14://1
-
-                                        break;
-                                    case 15://2
-
-                                        break;
-                                    case 16://3
-
-                                        break;
-                                    case 17://代码
-
-                                        break;
-                                    case 18://0
-
-                                        break;
-                                    case 19://00
-
-                                        break;
-                                    case 20://.
+                                    case 20://打印
 
                                         break;
 
