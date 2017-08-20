@@ -1524,4 +1524,51 @@ public class UserApi {
         VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
     }
 
+
+
+
+    /**
+     * 获取所有货物的简略信息
+     */
+
+    public static void getAllGoodsSimpleInfo(String tag, final String token, final String shopid, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, "http://ceshi.edianlai.com/market/api/get_all_goods", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+
+    public static void getOneGoods(String tag, final String token, final String shopid, final String goodsId ,Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, "http://ceshi.edianlai.com/market/api/get_one_goods", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("id", goodsId);
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
 }

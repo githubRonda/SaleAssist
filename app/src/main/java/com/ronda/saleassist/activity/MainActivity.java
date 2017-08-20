@@ -16,11 +16,19 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ronda.saleassist.R;
 import com.ronda.saleassist.activity.member.ManageVipActivity;
 import com.ronda.saleassist.activity.sale.SellManageActivity;
 import com.ronda.saleassist.activity.setting.SettingActivity;
 import com.ronda.saleassist.activity.stock.StockManageActivity;
+import com.ronda.saleassist.api.volley.GsonUtil;
+import com.ronda.saleassist.bean.BaseBean;
+import com.ronda.saleassist.bean.QuerySimpleGoods;
+import com.ronda.saleassist.local.sqlite.GreenDaoHelper;
+import com.ronda.saleassist.local.sqlite.table.SimpleGoodsBean;
+import com.ronda.saleassist.local.sqlite.table.SimpleGoodsBeanDao;
 import com.ronda.saleassist.zznew.guazhang.GuaZhangListActivity;
 import com.ronda.saleassist.api.UserApi;
 import com.ronda.saleassist.base.AppConst;
@@ -40,20 +48,25 @@ import com.ronda.saleassist.utils.ToastUtils;
 import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.ronda.saleassist.R.drawable.error;
 
 public class MainActivity extends BaseActivty implements NavigationView.OnNavigationItemSelectedListener {
 
     @BindView(R.id.nav_view)
     NavigationView mNavView;
     @BindView(R.id.drawer_layout)
-    DrawerLayout mDrawerLayout;
+    DrawerLayout   mDrawerLayout;
 
-    private String token = SPUtils.getString(AppConst.TOKEN, "");
+    private String token  = SPUtils.getString(AppConst.TOKEN, "");
     private String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
 
     private ActionBarDrawerToggle mDrawerToggle;
@@ -61,9 +74,9 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
     private BarcodeScannerResolver mBarcodeScannerResolver; //扫码解析器
 
     private WeightSerialPort mWeightSerialPort;
-    private String weightComm;
-    private String cmdComm;
-    public CmdSerialPort mCmdSerialPort;
+    private String           weightComm;
+    private String           cmdComm;
+    public  CmdSerialPort    mCmdSerialPort;
 
 
     @Override
@@ -85,6 +98,9 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
 
         //初始化指令交互的串口（上行(按键), 下行(数码管显示)）
         initCmdSerial();
+
+
+        getAllGoodsSimpleInfo();
     }
 
     @Override
@@ -270,10 +286,11 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
 
     /**
      * 下行指令（重量，单价，累计，总价）
+     *
      * @param hexStr
      */
-    public void writeCmd(String hexStr){
-        if (mCmdSerialPort==null||!mCmdSerialPort.isActive()){
+    public void writeCmd(String hexStr) {
+        if (mCmdSerialPort == null || !mCmdSerialPort.isActive()) {
             //ToastUtils.showToast("未设置指令串口，或串口设置有误");
             return;
         }
@@ -407,4 +424,45 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
                 });
     }
 
+    /**
+     * 获取所有货物的简略信息
+     */
+    private void getAllGoodsSimpleInfo() {
+        UserApi.getAllGoodsSimpleInfo(TAG, token, shopId,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String responseStr) {
+
+                        KLog.json(responseStr);
+
+                        QuerySimpleGoods querySimpleGoods = GsonUtil.getGson().fromJson(responseStr, QuerySimpleGoods.class);
+
+                        if (querySimpleGoods.getStatus() != 1) {
+                            ToastUtils.showToast(querySimpleGoods.getMsg());
+                            return;
+                        }
+
+                        final List<SimpleGoodsBean> data = querySimpleGoods.getData();
+                        final SimpleGoodsBeanDao dao = GreenDaoHelper.getDaoSession().getSimpleGoodsBeanDao();
+
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                for (SimpleGoodsBean simpleGoodsBean : data) {
+                                    SimpleGoodsBean unique = dao.queryBuilder().where(SimpleGoodsBeanDao.Properties.GoodsId.eq(simpleGoodsBean.getGoodsId())).unique();
+                                    if (unique == null) {
+                                        dao.insert(simpleGoodsBean);
+                                    }
+                                }
+                            }
+                        }.start();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        ToastUtils.showToast(R.string.no_respnose);
+                    }
+                });
+    }
 }

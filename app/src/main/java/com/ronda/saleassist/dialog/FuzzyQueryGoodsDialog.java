@@ -1,5 +1,7 @@
 package com.ronda.saleassist.dialog;
 
+import android.media.MediaDataSource;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,12 +15,18 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.ronda.saleassist.R;
 import com.ronda.saleassist.adapter.divider.DividerItemDecoration;
+import com.ronda.saleassist.api.UserApi;
+import com.ronda.saleassist.api.volley.GsonUtil;
 import com.ronda.saleassist.base.BaseDialogFragment;
 import com.ronda.saleassist.bean.CartBean;
+import com.ronda.saleassist.bean.QueryOneGoods;
+import com.ronda.saleassist.bean.QuerySimpleGoods;
 import com.ronda.saleassist.bean.SubCategory;
 import com.ronda.saleassist.local.sqlite.GreenDaoHelper;
 import com.ronda.saleassist.local.sqlite.table.SimpleGoodsBean;
@@ -141,9 +149,13 @@ public class FuzzyQueryGoodsDialog extends BaseDialogFragment {
 
             // TODO: 2017/8/19/0019 调用查询指定货物的接口，返回成功，则使用EventBus向货篮添加数据
             //EventBus.getDefault().post(new CartBean());
+
+            if (mCallbackListener!=null){
+                mCallbackListener.onCall(mAdapter.getData().get(mCurSelectPosition).getGoodsId());
+            }
         }
 
-        //dismiss();
+        dismiss();
     }
 
     public static FuzzyQueryGoodsDialog newInstance(String arg) {
@@ -154,6 +166,8 @@ public class FuzzyQueryGoodsDialog extends BaseDialogFragment {
         return fragment;
     }
 
+    SimpleGoodsBeanDao dao = GreenDaoHelper.getDaoSession().getSimpleGoodsBeanDao();
+
     /**
      * 模糊查询
      */
@@ -161,8 +175,9 @@ public class FuzzyQueryGoodsDialog extends BaseDialogFragment {
 
         KLog.d("fuzzyQuery: " + price);
 
-//        SimpleGoodsBeanDao dao = GreenDaoHelper.getDaoSession().getSimpleGoodsBeanDao();
-//        List<SimpleGoodsBean> list = dao.queryBuilder().where(SimpleGoodsBeanDao.Properties.Price.like("1.13%")).list();
+        List<SimpleGoodsBean> list = dao.queryBuilder().where(SimpleGoodsBeanDao.Properties.Price.like(price+"%")).list();
+        mAdapter.setNewData(list);
+
 //        System.out.println(list);
 
 
@@ -202,17 +217,17 @@ public class FuzzyQueryGoodsDialog extends BaseDialogFragment {
      * 回调方法
      */
     public interface CallbackListener {
-        void onCall(SubCategory subCategory);
+        void onCall(String goodsId);
     }
 
-    class MyAdapter extends BaseQuickAdapter<SubCategory, BaseViewHolder> {
+    class MyAdapter extends BaseQuickAdapter<SimpleGoodsBean, BaseViewHolder> {
 
         public MyAdapter() {
             super(R.layout.item_list_goods);
         }
 
         @Override
-        protected void convert(BaseViewHolder holder, SubCategory item) {
+        protected void convert(BaseViewHolder holder, SimpleGoodsBean item) {
             holder.setText(R.id.tv_name, item.getName());
             holder.setText(R.id.tv_price, item.getPrice());
 

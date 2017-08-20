@@ -57,6 +57,7 @@ import com.ronda.saleassist.bean.GoodsBean;
 import com.ronda.saleassist.bean.GoodsOrder;
 import com.ronda.saleassist.bean.GoodsStyle;
 import com.ronda.saleassist.bean.PriceEvent;
+import com.ronda.saleassist.bean.QueryOneGoods;
 import com.ronda.saleassist.bean.SubCategory;
 import com.ronda.saleassist.bean.WeightEvent;
 import com.ronda.saleassist.dialog.FuzzyQueryGoodsDialog;
@@ -94,26 +95,26 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 
 
     @BindView(R.id.btn_edit_order)
-    Button mBtnEditOrder;
+    Button             mBtnEditOrder;
     @BindView(R.id.btn_refresh)
-    Button mBtnRefresh;
+    Button             mBtnRefresh;
     @BindView(R.id.img_arrow_left)
-    ImageButton mImgArrowLeft;
+    ImageButton        mImgArrowLeft;
     @BindView(R.id.rv_category)
-    RecyclerView mRvCategory;
+    RecyclerView       mRvCategory;
     @BindView(R.id.recycler_view)
-    RecyclerView mRecyclerView;
+    RecyclerView       mRecyclerView;
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.btn_scan_down)
-    Button mBtnScanDown;
+    Button             mBtnScanDown;
     @BindView(R.id.fragment_category)
-    LinearLayout mFragmentCategory;
+    LinearLayout       mFragmentCategory;
 
-    private static final int SELECT_PICTURE = 0; // 相册选择图片请求
+    private static final int SELECT_PICTURE    = 0; // 相册选择图片请求
     private static final int CROP_REQUEST_CODE = 1; //裁剪图片请求
 
-    private String token = SPUtils.getString(AppConst.TOKEN, "");
+    private String token  = SPUtils.getString(AppConst.TOKEN, "");
     private String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
 
     private static final int ONE_SCREEN_SIZE = 36; // 表示一屏的数据。要比pageSize要小
@@ -121,10 +122,10 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
     public static int SELECT_POSITION = 0; //选中的分类项
 
     private int pageCount = 0; //分页加载的页码，当前页。（加载下一页成功后，会加1）。后台是从1开始。因为前台一开始是没有数据，所以初始化为0，当第一页数据加载成功之后，才为1
-    private int pageSize = 40; //每页的大小
+    private int pageSize  = 40; //每页的大小
 
     private CategoryAdapter mCategoryAdapter;
-    private GoodsAdapter mGoodsAdapter;
+    private GoodsAdapter    mGoodsAdapter;
 
     private ImageView img_pic; //修改货物对话框中的View，提取出来的原因就是因为在裁剪图片的回调方法中要设置
 
@@ -159,8 +160,17 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
 
         initDragGoodsEvent();
 
-        mQuickDialog = FuzzyQueryGoodsDialog.newInstance("quick_dialog");
+        mQuickDialog = FuzzyQueryGoodsDialog.newInstance("quick_dialog")
+                .setCallbackListener(new FuzzyQueryGoodsDialog.CallbackListener() {
+                    @Override
+                    public void onCall(String goodsId) {
+
+                        getOneGoods(goodsId);
+                    }
+                });
     }
+
+
 
     @Override
     public void onResume() {
@@ -188,7 +198,7 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
         }
 
         //先显示
-        if (!mQuickDialog.isVisible()){
+        if (!mQuickDialog.isVisible()) {
             mQuickDialog.show(getActivity().getSupportFragmentManager(), "quick_dialog");
         }
 
@@ -1357,6 +1367,50 @@ public class GoodsFragment extends BaseFragment implements BaseQuickAdapter.Requ
                             return;
                         }
 
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        ToastUtils.showToast(R.string.no_respnose);
+                    }
+                });
+    }
+
+
+    private void getOneGoods(String goodsId) {
+        UserApi.getOneGoods(TAG, token, shopId,goodsId,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        QueryOneGoods queryOneGoods  = GsonUtil.getGson().fromJson(response, QueryOneGoods.class);
+
+                        if (queryOneGoods.getStatus()!=1){
+                            ToastUtils.showToast(queryOneGoods.getMsg());
+                            return;
+                        }
+
+                        SubCategory goods = queryOneGoods.getData();
+
+                        String weight = "0.000";
+                        if ("1".equals(goods.getMethod())) { //计件类 ： 不需要获取秤端重量
+                            weight = "1";
+                        } else { //称重类， 需要货物秤端的重量
+                            if (mWeightEvent != null) {
+                                weight = mWeightEvent.getWeight();
+                            }
+                        }
+
+                        String discount = "1";
+                        if (goods.getDiscount2Enable()) {
+                            discount = goods.getDiscount2();
+                        }
+
+                        CartBean cartBean = new CartBean(goods.getGoods(), goods.getName(), goods.getPrice(), weight, goods.getPicurl(),
+                                discount, goods.getCategory().getId(), goods.getBargoods(), goods.getMethod(), goods.getUnit());
+
+                        EventBus.getDefault().post(cartBean);
                     }
                 },
                 new Response.ErrorListener() {
