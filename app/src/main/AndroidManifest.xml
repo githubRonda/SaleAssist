@@ -123,13 +123,13 @@
             android:name=".activity.MainActivity"
             android:screenOrientation="landscape"/>
         <activity
-            android:name=".activity.SettingActivity"
+            android:name=".activity.setting.SettingActivity"
             android:screenOrientation="landscape"/>
-        <activity android:name=".activity.SellManageActivity"/>
-        <activity android:name=".activity.LocationActivity"/>
-        <activity android:name=".activity.VersionActivity"/>
-        <activity android:name=".activity.ResetPassActivity"/>
-        <activity android:name=".activity.UserSuggestionActivity"/>
+        <activity android:name=".activity.sale.SellManageActivity"/>
+        <activity android:name=".activity.setting.LocationActivity"/>
+        <activity android:name=".activity.setting.VersionActivity"/>
+        <activity android:name=".activity.setting.ResetPassActivity"/>
+        <activity android:name=".activity.setting.UserSuggestionActivity"/>
         <activity android:name=".zznew.guazhang.GuaZhangListActivity"/>
         <activity android:name=".zznew.guazhang.GuaZhangOrderDetailActivity"/>
         <activity android:name=".zznew.guazhang.GuaZhangOrderListActivity"/>
@@ -141,6 +141,12 @@
         <activity android:name=".activity.member.VipListActivity"/>
         <activity android:name=".activity.member.VipListDetailActivity"/>
         <activity android:name=".activity.member.VipPreferenceActivity"/>
+        <activity android:name=".activity.sale.BillListActivity"/>
+        <activity android:name=".activity.sale.BillDetailActivity"/>
+        <activity android:name=".activity.sale.CategoryStatisticActivity"/>
+        <activity android:name=".activity.sale.BillListActivity"/>
+        <activity android:name=".activity.sale.GoodsStatisticActivity"/>
+        <activity android:name=".activity.sale.GoodsDetailActivity"/>
     </application>
 
 </manifest>

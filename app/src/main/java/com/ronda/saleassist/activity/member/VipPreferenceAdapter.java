@@ -4,8 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.ronda.saleassist.R;
-import com.ronda.saleassist.adapter.BaseRecyclerViewAdapter;
-import com.ronda.saleassist.adapter.RecyclerViewHolder;
+import com.ronda.saleassist.adapter.simple2.BaseRecyclerViewAdapter;
+import com.ronda.saleassist.adapter.simple2.RecyclerViewHolder;
 import com.ronda.saleassist.bean.PreferenceBean;
 
 import java.util.List;

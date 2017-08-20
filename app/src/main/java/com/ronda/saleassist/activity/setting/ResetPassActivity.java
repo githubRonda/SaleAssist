@@ -1,4 +1,4 @@
-package com.ronda.saleassist.activity;
+package com.ronda.saleassist.activity.setting;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,11 +11,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import com.ronda.saleassist.R;
+import com.ronda.saleassist.activity.LoginActivity;
 import com.ronda.saleassist.api.UserApi;
-import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.BaseActivty;
-import com.ronda.saleassist.base.SPHelper;
 import com.ronda.saleassist.local.preference.SPUtils;
 import com.ronda.saleassist.utils.MD5Utils;
 import com.ronda.saleassist.utils.ToastUtils;

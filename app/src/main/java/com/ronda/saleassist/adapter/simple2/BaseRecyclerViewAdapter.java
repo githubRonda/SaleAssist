@@ -1,4 +1,4 @@
-package com.ronda.saleassist.adapter;
+package com.ronda.saleassist.adapter.simple2;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

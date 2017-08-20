@@ -1129,4 +1129,262 @@ public class UserApi {
     }
 
 
+
+
+
+    /**
+     * 获取订单列表
+     * <p>
+     * //@param token 令牌
+     *
+     * @param shopid  商店id
+     * @param count   每页数据量（默认20）
+     * @param page    页码（默认1）
+     */
+    public static void getOrderList(String tag, final String token, final String shopid, final int count, final int page,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/order_info_list", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("count", count + "");
+                params.put("page", page + "");
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+
+
+    // 用于员工的报表，operator表示员工的uid
+    public static void getMemberOrderList(String tag, final String token, final String shopid,final String operator, final int count, final int page,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/order_member_info_list", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("operator", operator);
+                params.put("count", count + "");
+                params.put("page", page + "");
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+
+    /**
+     * 订单详细信息
+     * <p>
+     * //@param token 令牌
+     *
+     * @param no      订单编号
+     */
+
+    public static void getOrderDetail(String tag, final String token, final String shopid,final String no,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/order_info_detail", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("no", no);
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+
+
+    /**
+     * 获取折线图的数据
+     *
+     * @param shopid   商店id
+     * @param day      天数（默认当天）
+     * @param goodid   货物id（可空，填写获取7日销量数据-折线图使用）
+     * @param category 货物种类id（可空，填写获取7日销量数据-折线图使用
+     */
+    public static void getOrderInfoGoods(String tag, final String token, final String shopid,final String day, final String goodid, final String category, final String endtime,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/order_info_goods", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("day", day);
+                params.put("goodid", goodid);
+                params.put("category", category); //可空
+                params.put("endtime", endtime); //可空
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    public static void getMemberOrderInfoGoods(String tag, final String token, final String shopid,final String operator, final String day, final String goodid, final String category, final String endtime,
+                                               Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/order_member_info_goods", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("operator", operator);
+                params.put("day", day);
+                params.put("goodid", goodid);
+                params.put("category", category); //可空
+                params.put("endtime", endtime); //可空
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    /**
+     * 店铺收入信息概览
+     *
+     * @param shopid  商店id
+     * @param day     天数（默认当天）
+     */
+
+    public static void getOrderSurvey(String tag, final String token, final String shopid,final String day,
+                                      Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/order_survey", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("day", day);
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    public static void getMemberOrderSurvey(String tag, final String token, final String shopid,final String operator, final String day,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/order_member_survey", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("operator", operator);
+                params.put("day", day);
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+
+    /**
+     * 某种货物在时间段内的交易列表
+     *
+     * @param shopid
+     * @param day     距离今天的天数（统计天数，不传endtime时）
+     * @param goodid
+     * @param endtime 统计截止时间（可空，不传时默认结束为当天，格式Y-m-d）
+     * @param from    起始数据页码（可空，不传时默认0）
+     * @param size    数据每页条数（可空，不传时默认10）
+     */
+    public static void getGoodsDetialInTime(String tag, final String token, final String shopid, final String day, final String goodid, final String endtime, final String from, final String size,
+                                            Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/order_info_good_detail", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("day", day);
+                params.put("goodid", goodid);
+                params.put("endtime", endtime);
+                params.put("from", from);
+                params.put("size", size);
+
+                KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
 }

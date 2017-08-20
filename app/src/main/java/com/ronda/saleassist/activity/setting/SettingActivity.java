@@ -1,4 +1,4 @@
-package com.ronda.saleassist.activity;
+package com.ronda.saleassist.activity.setting;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.ronda.saleassist.R;
+import com.ronda.saleassist.activity.LoginActivity;
 import com.ronda.saleassist.base.AppConst;
 import com.ronda.saleassist.base.AppManager;
 import com.ronda.saleassist.base.BaseActivty;

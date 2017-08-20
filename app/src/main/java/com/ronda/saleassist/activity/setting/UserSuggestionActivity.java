@@ -1,4 +1,4 @@
-package com.ronda.saleassist.activity;
+package com.ronda.saleassist.activity.setting;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;

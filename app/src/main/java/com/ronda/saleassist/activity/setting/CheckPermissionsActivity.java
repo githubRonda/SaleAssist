@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.ronda.saleassist.activity;
+package com.ronda.saleassist.activity.setting;
 
 import android.Manifest;
 import android.app.Activity;

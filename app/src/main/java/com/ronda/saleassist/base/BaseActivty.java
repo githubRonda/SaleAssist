@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.ronda.saleassist.R;
 import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.dialog.DialogFactory;
+import com.ronda.saleassist.local.preference.SPUtils;
 
 /**
  * Activity的基类，方便进行后来的开发
@@ -29,6 +30,10 @@ public abstract class BaseActivty extends AppCompatActivity {
     protected Context mContext;
 
     protected DialogFactory mDialogFactory; // 确定框、进度框、和列表框
+
+    protected String token = SPUtils.getString(AppConst.TOKEN, "");
+    protected String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
