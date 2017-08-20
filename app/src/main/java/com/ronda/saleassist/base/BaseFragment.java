@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.ronda.saleassist.api.volley.VolleyUtil;
 import com.ronda.saleassist.base.dialog.DialogFactory;
+import com.ronda.saleassist.local.preference.SPUtils;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -30,6 +31,9 @@ public abstract class BaseFragment extends Fragment {
     protected DialogFactory mDialogFactory;
 
     private Unbinder unbinder;
+
+    protected String token = SPUtils.getString(AppConst.TOKEN, "");
+    protected String shopId = SPUtils.getString(AppConst.CUR_SHOP_ID, "");
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +65,12 @@ public abstract class BaseFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
 
+        VolleyUtil.getInstance().cancelPendingRequests(TAG);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
         VolleyUtil.getInstance().cancelPendingRequests(TAG);
     }
 }

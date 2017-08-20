@@ -103,6 +103,12 @@ mobile + password + confirmPassword + nickname + code
         * 手动检查更新 (build.gradle中配置appId和appkey)，自动检查更新：Beta.autoCheckUpgrade = true(MyApplication)
         * 修改密码
         * 用户反馈
+    * 挂账管理
+    * 会员管理
+    * 销售管理
+    * 库存管理[]
+    * 修改单价[]
+    * 我的店铺[]
 
 
 

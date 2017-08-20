@@ -388,6 +388,38 @@ public class UserApi {
         VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
     }
 
+    //这个是货物入库的接口，而且和上面的updateGood()访问的是同一个地址，只不过参数不同而已
+    public static void updateGood_ruku(String tag, final String token, final String shopid,
+                                       final String goodId, final String stock, final String cost, final String price, final String orderprice, final String discount2, final String discount3,
+                                       Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_goods_edit", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("type", 3 + ""); //3为入库
+                params.put("goods", goodId);
+
+                params.put("stock", stock);
+                params.put("cost", cost); //成本价
+                params.put("price", price);
+                params.put("orderprice", orderprice); //总价值（可空，空值时接口自动计算）
+                params.put("discount2", discount2);
+                params.put("discount3", discount3);
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
     /**
      * 10. 店铺货物信息获取
      * 排序类型 1为id升序 2为id降序 3为价格升序 4为价格降序
@@ -1381,6 +1413,111 @@ public class UserApi {
                 params.put("size", size);
 
                 KLog.w(new Gson().toJson(params));
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+
+    /**
+     * 26. 盘库操作处理接口：
+     *
+     * @param data
+     * @param type
+     * @param method
+     */
+    public static void manageStock(String tag, final String token, final String shopid, final String data, final int type, final String method,
+                                   Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_stock_manage", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("data", data);
+                params.put("type", type + "");  //操作类型1预留至下一次盘库，2清空库存，3撤销操作
+                params.put("method", method); //type=3即撤销操作时传入字符reset（可空）
+                return params;
+            }
+        };
+
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+    public static void getStockInfo(String tag, final String token, final String shopid, final String percent, final String bar,
+                                    Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_stock_info_get", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("percent", percent); //对库存在某个百分比下的货物进行盘库处理（例：传0.05，即5%)
+                params.put("bar", bar); //默认不对条码货物进行盘库，如需进行此参数传1（可空）
+                return params;
+            }
+        };
+        VolleyUtil.getInstance().addToRequestQueue(strReq, tag);
+    }
+
+
+    /**
+     * 24 条码货物入库接口：
+     *
+     * @param barcode
+     * @param number
+     * @param new_t
+     * @param goods
+     * @param name
+     * @param stock
+     * @param cost
+     * @param price
+     * @param discount2
+     * @param discount3
+     * @param orderprice
+     */
+
+    public static void bargoodsInSet(String tag, final String token, final String shopid,
+                                     final String barcode, final String number, final String new_t, final String goods, final String name, final String stock, final String cost,
+                                     final String price, final String discount2, final String discount3, final String orderprice,
+                                     Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        if (!NetUtils.isConnected(MyApplication.getInstance())) {
+            ToastUtils.showToast("无网络连接");
+            return;
+        }
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, OFFICIAL_SERVER + "/market/api/shop_bargoods_inset", listener, errorListener) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("token", token);
+                params.put("shopid", shopid);
+                params.put("barcode", barcode);
+                params.put("number", number);//入库数量
+                params.put("new", new_t); //填1（22接口返回status=-20时）
+                params.put("goods", goods); //货物id（22接口正常返回data中）
+                params.put("name", name); //货物名称（new时必填，同时会修改货物表名称）
+                params.put("stock", stock); //库存
+                params.put("cost", cost); //成本，这个应该是进价进价aaaabcde
+                params.put("price", price); // 售价
+                params.put("discount2", discount2); //折扣
+                params.put("discount3", discount3);
+                params.put("orderprice", orderprice); //总价值（可空，空时接口进行计算）
                 return params;
             }
         };

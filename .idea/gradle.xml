@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/app_BaseRecyclerView" />
+            <option value="$PROJECT_DIR$/dropEditText" />
             <option value="$PROJECT_DIR$/lib_rv_adapter" />
             <option value="$PROJECT_DIR$/lib_rv_adapter2" />
           </set>

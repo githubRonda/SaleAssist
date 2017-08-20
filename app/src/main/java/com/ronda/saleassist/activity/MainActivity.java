@@ -20,6 +20,7 @@ import com.ronda.saleassist.R;
 import com.ronda.saleassist.activity.member.ManageVipActivity;
 import com.ronda.saleassist.activity.sale.SellManageActivity;
 import com.ronda.saleassist.activity.setting.SettingActivity;
+import com.ronda.saleassist.activity.stock.StockManageActivity;
 import com.ronda.saleassist.zznew.guazhang.GuaZhangListActivity;
 import com.ronda.saleassist.api.UserApi;
 import com.ronda.saleassist.base.AppConst;
@@ -193,9 +194,9 @@ public class MainActivity extends BaseActivty implements NavigationView.OnNaviga
             case R.id.ll_sell_manage:
                 jump(SellManageActivity.class);
                 break;
-//            case R.id.ll_stock_manage:
-//                jump(StockManageActivity.class);
-//                break;
+            case R.id.ll_stock_manage:
+                jump(StockManageActivity.class);
+                break;
 
 
 //            case R.id.ll_shop_apply:

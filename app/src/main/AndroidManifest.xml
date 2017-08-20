@@ -147,6 +147,10 @@
         <activity android:name=".activity.sale.BillListActivity"/>
         <activity android:name=".activity.sale.GoodsStatisticActivity"/>
         <activity android:name=".activity.sale.GoodsDetailActivity"/>
+        <activity android:name=".activity.stock.RukuCaptureActivity"/>
+        <activity android:name=".activity.stock.StockActivity"/>
+        <activity android:name=".activity.stock.StockManageActivity"/>
+        <activity android:name=".activity.stock.PankuActivity"/>
     </application>
 
 </manifest>
